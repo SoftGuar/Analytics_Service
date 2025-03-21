@@ -52,7 +52,7 @@ export class ZonesService {
       const result = await prisma.$queryRaw<
         { zone_id: number; total_obstacles: number }[]
       >`
-          SELECT zone_id, SUM(obstacles_encountered) AS total_obstacles
+          SELECT zone_id, SUM(obstacles_encountered)::Integer AS total_obstacles
           FROM "Zone_logs"
           GROUP BY zone_id
           ORDER BY total_obstacles DESC
