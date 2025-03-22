@@ -1,5 +1,5 @@
-import { PrismaClient as MainPrismaClient } from '../prisma/generated/main';
-import { PrismaClient as AnalyticsClient } from '../prisma/generated/anayltics';
+import { PrismaClient as MainPrismaClient } from '../../prisma/generated/main';
+import { PrismaClient as AnalyticsClient } from '../../prisma/generated/anayltics';
 const prisma = new MainPrismaClient();
 const analyticsPrisma = new AnalyticsClient();
 export class UserSessionsService {

@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { UserSessionsService } from "../services/UserSessionsService";
+import { UserSessionsService } from "../services/UserSession/UserSessionsService";
 
 // filepath: c:\Users\KHALED\Documents\GitHub\Analytics_service\app\handlers\UserHandler.ts
 
