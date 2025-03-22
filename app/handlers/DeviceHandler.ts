@@ -19,4 +19,13 @@ export class DeviceHandler {
             reply.status(500).send({ error: "Failed to fetch device issues over time" });
         }
     }
+    static async getDeviceIssues(req: FastifyRequest, reply: FastifyReply) {
+        try {
+            const deviceIssues = await DeviceService.getDeviceIssues();
+            reply.status(200).send(deviceIssues);
+        } catch (error) {
+            console.error("Error in DeviceHandler.getDeviceIssues:", error);
+            reply.status(500).send({ error: "Failed to fetch device issues" });
+        }
+    }
 }

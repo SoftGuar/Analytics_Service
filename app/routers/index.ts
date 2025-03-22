@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { navigationRoutes } from './NavigationRoutes';
+import { navigationRoutes } from './Navigation/NavigationRoutes';
 import { DeviceRoutes } from './DeviceRoutes';
 import { PoisRoutes } from './PoisRoutes';
 import { zonesRoutes } from './ZonesRoutes';

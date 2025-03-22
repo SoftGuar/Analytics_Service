@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { NavigationService } from "../services/NavigationService";
+import { NavigationService } from "../../services/Navigation/NavigationService";
 
 export async function getNavigationLogs(request: FastifyRequest, reply: FastifyReply) {
     try {

@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { ZonesService } from "../services/ZonesService";
+import { ZonesService } from "../../services/ZonesService";
 
 export async function getTopVisitedZonesHandler(request: FastifyRequest, reply: FastifyReply) {
     try {

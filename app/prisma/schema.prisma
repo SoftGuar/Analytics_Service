@@ -6,7 +6,7 @@
 
 generator client {
    provider = "prisma-client-js"
-  output   = "../generated/anayltics"
+  output   = "../prisma/generated/anayltics"
 }
 
 datasource db {
@@ -20,7 +20,7 @@ model Navigation_logs {
   environment_id  Int
   rerouting_count Int
   start_time      DateTime
-  end_time        DateTime
+  end_time        DateTime?
   zoneLogs        Zone_logs[]
   poiLogs         POI_logs[]
 }
