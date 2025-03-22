@@ -1,12 +1,14 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { PrismaClient as MainPrismaClient } from '../prisma/generated/main';
+import { PrismaClient as AnalyticsClient } from '../prisma/generated/anayltics';
+const prisma = new MainPrismaClient();
+const analyticsPrisma = new AnalyticsClient();
 
 export class ZonesService {
   static async getTopVisitedZones(): Promise<
     { zone_id: number; visit_count: number }[]
   > {
     try {
-      const result = await prisma.zone_logs.groupBy({
+      const result = await analyticsPrisma.zone_logs.groupBy({
         by: ["zone_id"],
         _count: {
           zone_id: true,
@@ -30,7 +32,7 @@ export class ZonesService {
   }
   static async getAverageTimeSpentInZones(){
     try {
-      const result = await prisma.$queryRaw<
+      const result = await analyticsPrisma.$queryRaw<
         { zone_id: number; avg_time_seconds: number }[]
       >`
             SELECT 
@@ -49,7 +51,7 @@ export class ZonesService {
   }
   static async getZonesWithHighestObstacleCount(){
     try {
-      const result = await prisma.$queryRaw<
+      const result = await analyticsPrisma.$queryRaw<
         { zone_id: number; total_obstacles: number }[]
       >`
           SELECT zone_id, SUM(obstacles_encountered)::Integer AS total_obstacles

@@ -21,4 +21,24 @@ export class DeviceService {
             throw error;
         }
     }
+    static async getDeviceIssuesOverTime(){
+        try {
+            const result = await prisma.$queryRaw
+            <{dispositive_id: number; issue_count: number}[]>
+            `
+            SELECT 
+            DATE_TRUNC('month', di.date) AS month,
+            d.type,
+            COUNT(di.id) AS issue_count
+            FROM "DispoIssue" di
+            JOIN "Dispositive" d ON di.dispositiveId = d.id
+            GROUP BY DATE_TRUNC('month', di.date), d.type
+            ORDER BY month, d.type;
+            `
+            return result;
+        } catch (error) {
+            console.error("Error fetching device issues over time:", error);
+            throw error;
+        }
+    }
 }

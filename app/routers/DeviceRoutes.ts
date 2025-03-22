@@ -5,4 +5,5 @@ import { DeviceHandler } from "../handlers/DeviceHandler";
 
 export async function DeviceRoutes(fastify: FastifyInstance) {
     fastify.get("/device/status", DeviceHandler.getDeviceStatus);
+    fastify.get("/device/issues", DeviceHandler.getDeviceIssuesOverTime);
 }

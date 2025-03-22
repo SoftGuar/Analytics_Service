@@ -1,10 +1,12 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { PrismaClient as MainPrismaClient } from '../prisma/generated/main';
+import { PrismaClient as AnalyticsClient } from '../prisma/generated/anayltics';
+const prisma = new MainPrismaClient();
+const analyticsPrisma = new AnalyticsClient();
 
 export class NavigationService {
     static async getAllNavigationLogs(){
         try{
-            const result = await prisma.navigation_logs.findMany();
+            const result = await analyticsPrisma.navigation_logs.findMany();
             return result;
         }
         catch(error){
@@ -14,7 +16,7 @@ export class NavigationService {
     }
     static async getMostReroutingRequests(){
         try{
-            const result = await prisma.$queryRaw<{environment_id: number; reroute_count: number}[]>
+            const result = await analyticsPrisma.$queryRaw<{environment_id: number; reroute_count: number}[]>
             `
                 SELECT environment_id,rerouting_count
                 FROM "Navigation_logs"
@@ -30,7 +32,7 @@ export class NavigationService {
     }
     static async getSuccessfulNavigations() {
         try {
-            const result = await prisma.$queryRaw<
+            const result = await analyticsPrisma.$queryRaw<
                 { date: Date; total_attempts: number; successful_navigations: number; success_rate: number }[]
             >`
                 SELECT

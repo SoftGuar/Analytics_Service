@@ -1,10 +1,12 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { PrismaClient as MainPrismaClient } from '../prisma/generated/main';
+import { PrismaClient as AnalyticsClient } from '../prisma/generated/anayltics';
+const prisma = new MainPrismaClient();
+const analyticsPrisma = new AnalyticsClient();
 
 export class POIsService {
     static async getTopVisitedPOIs(): Promise<{ POI_id: number; visit_count: number }[]> {
         try {
-            const result = await prisma.pOI_logs.groupBy({
+            const result = await analyticsPrisma.pOI_logs.groupBy({
                 by: ['poi_id'],
                 _count: {
                     poi_id: true,
