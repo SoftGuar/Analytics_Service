@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { DeviceService } from "../services/DeviceService";
+import { DeviceService } from "../../services/devices/DeviceService";
 export class DeviceHandler {
     static async getDeviceStatus(req: FastifyRequest, reply: FastifyReply) {
         try {

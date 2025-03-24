@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { DeviceHandler } from "../handlers/DeviceHandler";
+import { DeviceHandler } from "../../handlers/devices/DeviceHandler";
 
 // filepath: c:\Users\KHALED\Documents\GitHub\Analytics_service\app\routers\DeviceRoutes.ts
 
