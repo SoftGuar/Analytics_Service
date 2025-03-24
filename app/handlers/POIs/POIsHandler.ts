@@ -1,7 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { POIsService } from '../services/POIsService';
-
-// filepath: c:\Users\KHALED\Documents\GitHub\Analytics_service\app\handlers\POIsHandler.ts
+import { POIsService } from '../../services/POIs/POIsService';
 
 export class POIsHandler {
     static async getTopVisitedPOIs(req: FastifyRequest, reply: FastifyReply): Promise<void> {

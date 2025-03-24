@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { UserHandler } from "../handlers/UserHandler";
+import { UserHandler } from "../../handlers/UserHandler";
 
 export async function UserRoutes(fastify: FastifyInstance) {
     fastify.get("/users/top", UserHandler.getTopUsers);

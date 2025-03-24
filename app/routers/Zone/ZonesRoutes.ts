@@ -3,7 +3,7 @@ import {
     getTopVisitedZonesHandler,
     getAverageTimeSpentHandler,
     getHighestObstaclesHandler,
-} from "../handlers/ZonesHandler";
+} from "../../handlers/Zone/ZonesHandler";
 
 export async function zonesRoutes(fastify: FastifyInstance) {
     fastify.get("/zones/top-visited", getTopVisitedZonesHandler);

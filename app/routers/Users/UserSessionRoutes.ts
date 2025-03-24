@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { UserSessionLogsHandler } from '../handlers/UserSession/UserSessionLogsHandler';
+import { UserSessionLogsHandler } from '../../handlers/UserSession/UserSessionLogsHandler';
 
 export default async function userSessionRoutes(fastify: FastifyInstance): Promise<void> {
     const handler = new UserSessionLogsHandler();
