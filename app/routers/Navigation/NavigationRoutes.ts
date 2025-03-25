@@ -3,7 +3,7 @@ import {
     getNavigationLogs,
     getMostReroutingRequests,
     getSuccessfulNavigations
-} from "../handlers/Navigation/NavigationHandler";
+} from "../../handlers/Navigation/NavigationHandler";
 
 export async function navigationRoutes(fastify: FastifyInstance) {
     fastify.get("/navigation/logs", getNavigationLogs);

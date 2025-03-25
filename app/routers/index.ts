@@ -10,6 +10,7 @@ import userSessionRoutes from './Users/UserSessionRoutes';
 import NavigationLogsRoutes from './Navigation/NavigationLogsRoutes';
 import DeviceLogsRoutes from './devices/deviceLogsRoutes';
 import { feedbackRoutes } from './feedbackRoutes';
+import { salesStatsRoutes } from './saleStatsRoutes';
 
 export default async function (app: FastifyInstance) {
     //stats routes
@@ -18,6 +19,7 @@ export default async function (app: FastifyInstance) {
     await PoisRoutes(app);
     await zonesRoutes(app);
     await UserRoutes(app);
+    await salesStatsRoutes(app);
 
     //registring logs routes 
     await POIsLogRoutes(app);

@@ -1,5 +1,5 @@
 generator client {
-   provider = "prisma-client-js"
+  provider = "prisma-client-js"
   output   = "../prisma/generated/main"
 }
 
@@ -39,6 +39,17 @@ model Decider {
   phone      String?
 }
 
+model DispoIssue {
+  id            Int        @id @default(autoincrement())
+  dispositiveId Int
+  description   String
+  date          DateTime   @default(now())
+  status        String
+  maintainerId  Int
+  Maintainer    Maintainer @relation(fields: [maintainerId], references: [id])
+  Dispositive   Dispositive @relation(fields: [dispositiveId], references: [id])
+}
+
 model Dispositive {
   id                 Int                  @id @default(autoincrement())
   type               String
@@ -52,6 +63,7 @@ model Dispositive {
   Product            Product              @relation(fields: [product_id], references: [id], onDelete: Cascade)
   User               User?                @relation(fields: [user_id], references: [id], onDelete: Cascade)
   ProductTransaction ProductTransaction[]
+  DispotiveIssue     DispoIssue[]
 }
 
 model Helper {
@@ -64,15 +76,29 @@ model Helper {
   User       User[]  @relation("UserHelpers")
 }
 
+model Intervention {
+  idMaintainer Int
+  idUser       Int
+  description  String
+  start_date         DateTime   @default(now())
+  end_date           DateTime
+  type         String
+  status       String
+  Maintainer   Maintainer @relation(fields: [idMaintainer], references: [id])
+  User         User       @relation(fields: [idUser], references: [id])
+
+  @@id([idMaintainer, idUser])
+}
+
 model Maintainer {
-  id         Int     @id @default(autoincrement())
-  first_name String
-  last_name  String
-  email      String  @unique
-  password   String
-  phone      String?
-  dispoIssues DispoIssue[]
-  interventions Intervention[]
+  id           Int            @id @default(autoincrement())
+  first_name   String
+  last_name    String
+  email        String         @unique
+  password     String
+  phone        String?
+  DispoIssue   DispoIssue[]
+  Intervention Intervention[]
 }
 
 model Product {
@@ -133,42 +159,16 @@ model Transaction {
 }
 
 model User {
-  id          Int           @id @default(autoincrement())
-  email       String        @unique
-  first_name  String
-  last_name   String
-  password    String
-  phone       String?
-  Dispositive Dispositive[]
-  Quotation   Quotation[]
-  Transaction Transaction[]
-  Helper      Helper[]      @relation("UserHelpers")
-  interventions Intervention[]
-}
-model DispoIssue {
-  id            Int     @id @default(autoincrement())
-  dispositiveId Int
-  description   String
-  date          DateTime @default(now())
-  status        String
-  maintainerId  Int
-
-  // Relations
-  maintainer    Maintainer @relation(fields: [maintainerId], references: [id])
-}
-
-model Intervention {
-  idMaintainer Int
-  idUser       Int
-  description  String
-  date         DateTime @default(now())
-  type         String
-  status       String
-
-  // Composite primary key
-  @@id([idMaintainer, idUser])
-
-  // Relations
-  maintainer   Maintainer @relation(fields: [idMaintainer], references: [id])
-  user         User       @relation(fields: [idUser], references: [id])
+  id           Int            @id @default(autoincrement())
+  email        String         @unique
+  first_name   String
+  last_name    String
+  password     String
+  phone        String?
+  created_at   DateTime       @default(now())
+  Dispositive  Dispositive[]
+  Intervention Intervention[]
+  Quotation    Quotation[]
+  Transaction  Transaction[]
+  Helper       Helper[]       @relation("UserHelpers")
 }
