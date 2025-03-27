@@ -1,36 +1,84 @@
 import { PrismaClient } from "../prisma/generated/main";
-const prisma = new PrismaClient();
 
 export class SalesStatsService {
-  async getCRR() {
+  async getCRR(
+    prisma: PrismaClient = new PrismaClient()
+  ) {
     try {
       const result = await prisma.$queryRaw<
-        { id: number; new_customers: number; existing_customers: number }[]
+        { new_customers: number; existing_customers: number }[]
       >`
-            SELECT
-            id,
-            COUNT(DISTINCT CASE WHEN DATE_PART('day', NOW() - created_at) <= 30 THEN id END)::Integer AS new_customers,
-            COUNT(DISTINCT CASE WHEN DATE_PART('day', NOW() - created_at) > 30 THEN id END)::Integer AS existing_customers
-            FROM
-            "User"
-            GROUP BY
-            id;
+        WITH CustomerClassification AS (
+          SELECT 
+            CASE 
+              WHEN created_at >= NOW() - INTERVAL '30 days' THEN 'new'
+              ELSE 'existing'
+            END AS customer_type
+          FROM "User"
+        )
+        SELECT 
+          COUNT(DISTINCT CASE WHEN customer_type = 'new' THEN 1 END)::Integer AS new_customers,
+          COUNT(DISTINCT CASE WHEN customer_type = 'existing' THEN 1 END)::Integer AS existing_customers
+        FROM CustomerClassification;
     `;
 
-      const newCustomers = result.reduce(
-        (acc, { new_customers }) => acc + new_customers,
-        0
-      );
-      const existingCustomers = result.reduce(
-        (acc, { existing_customers }) => acc + existing_customers,
-        0
-      );
+      // Destructure the first (and likely only) row
+      const { new_customers, existing_customers } = result[0] || { new_customers: 0, existing_customers: 0 };
+      
+      // Prevent division by zero
+      const totalCustomers = new_customers + existing_customers;
+      if (totalCustomers === 0) {
+        return 0;
+      }
 
-      const crr =
-        (existingCustomers / (newCustomers + existingCustomers)) * 100;
-      return crr;
+      // Calculate Customer Retention Rate (CRR)
+      const crr = (existing_customers / totalCustomers) * 100;
+      
+      return Number(crr.toFixed(2)); // Round to 2 decimal places
     } catch (error) {
       console.error("Error calculating Customer Retention Rate:", error);
+      throw error;
+    }
+  }
+
+  // Optional: Add method to get more detailed retention insights
+  async getCustomerRetentionDetails(
+    prisma: PrismaClient = new PrismaClient()
+  ) {
+    try {
+      const result = await prisma.$queryRaw<
+        { 
+          new_customers: number; 
+          existing_customers: number; 
+          total_customers: number;
+          retention_rate: number;
+        }[]
+      >`
+        WITH CustomerClassification AS (
+          SELECT 
+            CASE 
+              WHEN created_at >= NOW() - INTERVAL '30 days' THEN 'new'
+              ELSE 'existing'
+            END AS customer_type
+          FROM "User"
+        )
+        SELECT 
+          COUNT(DISTINCT CASE WHEN customer_type = 'new' THEN 1 END)::Integer AS new_customers,
+          COUNT(DISTINCT CASE WHEN customer_type = 'existing' THEN 1 END)::Integer AS existing_customers,
+          COUNT(DISTINCT 1)::Integer AS total_customers,
+          (COUNT(DISTINCT CASE WHEN customer_type = 'existing' THEN 1 END) * 100.0 / 
+           NULLIF(COUNT(DISTINCT 1), 0))::Numeric(5,2) AS retention_rate
+        FROM CustomerClassification;
+    `;
+
+      return result[0] || {
+        new_customers: 0,
+        existing_customers: 0,
+        total_customers: 0,
+        retention_rate: 0
+      };
+    } catch (error) {
+      console.error("Error fetching customer retention details:", error);
       throw error;
     }
   }

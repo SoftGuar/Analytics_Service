@@ -3,7 +3,9 @@ import { PrismaClient as AnalyticsClient } from "../../prisma/generated/anayltic
 const prisma = new MainPrismaClient();
 const analyticsPrisma = new AnalyticsClient();
 export class UserSessionsService {
-  static async getTopUsers(): Promise<
+  static async getTopUsers(
+    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+  ): Promise<
     { user_id: number; session_count: number }[]
   > {
     try {
@@ -29,7 +31,9 @@ export class UserSessionsService {
       throw error;
     }
   }
-  static async getUserRatings() {
+  static async getUserRatings(
+    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+  ) {
     try {
       const result = await analyticsPrisma.$queryRaw<{
         overall_avg_rating: number;
@@ -43,7 +47,9 @@ export class UserSessionsService {
       throw error;
     }
   }
-  static async getUserFeedback() {
+  static async getUserFeedback(
+    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+  ) {
     try {
       const result = await analyticsPrisma.feedback.findMany();
       return result;
@@ -52,7 +58,9 @@ export class UserSessionsService {
       throw error;
     }
   }
-  static async getUserSessionDuration() {
+  static async getUserSessionDuration(
+    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+  ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
         { user_id: number; avg_session_duration_seconds: number }[]
@@ -71,7 +79,9 @@ export class UserSessionsService {
       throw error;
     }
   }
-  static async getDAUs() {
+  static async getDAUs(
+    analyticsPrisma: AnalyticsClient = new AnalyticsClient
+  ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
         { date: Date; dau_count: number }[]
@@ -89,7 +99,9 @@ export class UserSessionsService {
       throw error;
     }
   }
-  static async getMAUs() {
+  static async getMAUs(
+    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+  ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
         { date: Date; mau_count: number }[]
@@ -107,7 +119,9 @@ export class UserSessionsService {
       throw error;
     }
   }
-  static async getWAUs() {
+  static async getWAUs(
+    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+  ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
         { date: Date; wau_count: number }[]

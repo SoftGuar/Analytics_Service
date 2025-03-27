@@ -1,10 +1,10 @@
 import { PrismaClient as MainPrismaClient } from "../../prisma/generated/main";
 import { PrismaClient as AnalyticsClient } from "../../prisma/generated/anayltics";
-const prisma = new MainPrismaClient();
-const analyticsPrisma = new AnalyticsClient();
 
 export class DeviceService {
-  static async getDeviceStatus() {
+  static async getDeviceStatus(
+    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+  ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
         {
@@ -28,7 +28,10 @@ export class DeviceService {
       throw error;
     }
   }
-  static async getDeviceIssuesOverTime() {
+
+  static async getDeviceIssuesOverTime(
+    prisma: MainPrismaClient = new MainPrismaClient()
+  ) {
     try {
       const result = await prisma.$queryRaw<
         { dispositive_id: number; issue_count: number }[]
@@ -48,7 +51,10 @@ export class DeviceService {
       throw error;
     }
   }
-  static async getDeviceIssues() {
+
+  static async getDeviceIssues(
+    prisma: MainPrismaClient = new MainPrismaClient()
+  ) {
     try {
       const deviceIssueFrequency = await prisma.dispoIssue.groupBy({
         by: ["dispositiveId"],
@@ -67,7 +73,11 @@ export class DeviceService {
       throw error;
     }
   }
-  static async getDevicePerformance() {
+
+  static async getDevicePerformance(
+    prisma: MainPrismaClient = new MainPrismaClient(),
+    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+  ) {
     try {
       const dispositiveIssues = await prisma.dispositive.findMany({
         include: {
@@ -86,13 +96,10 @@ export class DeviceService {
         },
       });
 
-      // Query device usage logs from analytics database
       const deviceUsageLogs = await analyticsPrisma.deviceUsageLogs.findMany();
 
-      // Merge and process data in application code
       const devicePerformance = dispositiveIssues
         .map((device) => {
-          // Calculate average battery level
           const deviceLogs = deviceUsageLogs.filter(
             (log) => log.dispositive_id === device.id
           );
@@ -101,7 +108,6 @@ export class DeviceService {
               deviceLogs.length
             : null;
 
-          // Calculate total issues and average days to first issue
           const totalIssues = device.DispotiveIssue.length;
           const avgDaysToFirstIssue =
             totalIssues > 0
@@ -130,12 +136,14 @@ export class DeviceService {
       throw error;
     }
   }
-  static async devicesSold() {
+
+  static async devicesSold(
+    prisma: MainPrismaClient = new MainPrismaClient()
+  ) {
     try {
       const devicesSold = await prisma.$queryRaw<
         { sale_month: Date; devices_sold: number; total_revenue: number }[]
       >`
-            -- Track device sales by month
             SELECT 
                 DATE_TRUNC('month', t.date) AS sale_month,
                 COUNT(DISTINCT pt.dispositive_id)::Integer AS devices_sold,
@@ -158,7 +166,10 @@ export class DeviceService {
       throw error;
     }
   }
-  static async deviceRevenue() {
+
+  static async deviceRevenue(
+    prisma: MainPrismaClient = new MainPrismaClient()
+  ) {
     try {
       const deviceRevenue = await prisma.$queryRaw<
         {
@@ -196,12 +207,14 @@ export class DeviceService {
       throw error;
     }
   }
-  static async getMostPopularDevices() {
+
+  static async getMostPopularDevices(
+    prisma: MainPrismaClient = new MainPrismaClient()
+  ) {
     try {
       const mostPopularDevices = await prisma.$queryRaw<
         { device_id: number; device_mac: string; issue_count: number }[]
       >`
-            -- Ranking of device types by sales and usage
             SELECT 
                 p.name AS product_name,
                 COUNT(DISTINCT d.id)::Integer AS total_devices,
@@ -225,12 +238,14 @@ export class DeviceService {
       throw error;
     }
   }
-  static async getDeviceIntervention() {
+
+  static async getDeviceIntervention(
+    prisma: MainPrismaClient = new MainPrismaClient()
+  ) {
     try {
       const deviceIntervention = await prisma.$queryRaw<
         { device_id: number; intervention_count: number }[]
       >`
-            -- Track interventions by month and type
             SELECT 
                 DATE_TRUNC('month', date) AS intervention_month,
                 type,

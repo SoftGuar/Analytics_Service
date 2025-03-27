@@ -4,7 +4,7 @@ const prisma = new MainPrismaClient();
 const analyticsPrisma = new AnalyticsClient();
 
 export class NavigationService {
-  static async getAllNavigationLogs() {
+  static async getAllNavigationLogs(analyticsPrisma: AnalyticsClient = new AnalyticsClient()) {
     try {
       const result = await analyticsPrisma.navigation_logs.findMany();
       return result;
@@ -13,7 +13,9 @@ export class NavigationService {
       throw error;
     }
   }
-  static async getMostReroutingRequests() {
+  static async getMostReroutingRequests(
+    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+  ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
         { environment_id: number; reroute_count: number }[]
@@ -29,7 +31,9 @@ export class NavigationService {
       throw error;
     }
   }
-  static async getSuccessfulNavigations() {
+  static async getSuccessfulNavigations(
+    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+  ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
         {

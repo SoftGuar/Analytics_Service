@@ -4,7 +4,9 @@ const prisma = new MainPrismaClient();
 const analyticsPrisma = new AnalyticsClient();
 
 export class InterventionService {
-  static async getInterventionAverageDuration() {
+  static async getInterventionAverageDuration(
+    prisma: MainPrismaClient = new MainPrismaClient()
+  ) {
     try {
       const result = await prisma.$queryRaw<{ avg_repair_time: number }>`
             SELECT AVG(EXTRACT(EPOCH FROM end_date) - EXTRACT(EPOCH FROM start_date)) AS avg_repair_time
@@ -17,7 +19,9 @@ export class InterventionService {
       throw error;
     }
   }
-  static async getMonthlyAverageDuration() {
+  static async getMonthlyAverageDuration(
+    prisma: MainPrismaClient = new MainPrismaClient()
+  ) {
     try {
       const result = await prisma.$queryRaw<
         { month: number; year: number; average_duration: number }[]
@@ -38,7 +42,9 @@ export class InterventionService {
       throw error;
     }
   }
-  static async getMaintainerInterventionCount() {
+  static async getMaintainerInterventionCount(
+    prisma: MainPrismaClient = new MainPrismaClient()
+  ) {
     try {
       const result = await prisma.$queryRaw<
         { maintainer_id: number; intervention_count: number }[]
@@ -57,7 +63,9 @@ export class InterventionService {
       throw error;
     }
   }
-  static async getAverageAnswerTime() {
+  static async getAverageAnswerTime(
+    prisma: MainPrismaClient = new MainPrismaClient()
+  ) {
     try {
       const result = await prisma.$queryRaw<
         {
@@ -84,6 +92,3 @@ export class InterventionService {
   }
 }
 
-InterventionService.getAverageAnswerTime().then((result) =>
-  console.log(result)
-);

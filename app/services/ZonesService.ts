@@ -4,7 +4,9 @@ const prisma = new MainPrismaClient();
 const analyticsPrisma = new AnalyticsClient();
 
 export class ZonesService {
-  static async getTopVisitedZones(): Promise<
+  static async getTopVisitedZones(
+    analyticsPrisma: AnalyticsClient = new AnalyticsClient
+  ): Promise<
     { zone_id: number; visit_count: number }[]
   > {
     try {
@@ -30,7 +32,9 @@ export class ZonesService {
       throw error;
     }
   }
-  static async getAverageTimeSpentInZones() {
+  static async getAverageTimeSpentInZones(
+    analyticsPrisma: AnalyticsClient = new AnalyticsClient
+  ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
         { zone_id: number; avg_time_seconds: number }[]
@@ -49,7 +53,9 @@ export class ZonesService {
       throw error;
     }
   }
-  static async getZonesWithHighestObstacleCount() {
+  static async getZonesWithHighestObstacleCount(
+    analyticsPrisma: AnalyticsClient = new AnalyticsClient
+  ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
         { zone_id: number; total_obstacles: number }[]
