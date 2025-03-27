@@ -7,11 +7,10 @@ import { UserRoutes } from './Users/UserRoutes';
 import { salesStatsRoutes } from './sales/saleStatsRoutes';
 
 export default async function (app: FastifyInstance) {
-    //stats routes
-    await navigationRoutes(app);
-    await DeviceRoutes(app);
-    await PoisRoutes(app);
-    await zonesRoutes(app);
-    await UserRoutes(app);
-    await salesStatsRoutes(app);
+    app.register(DeviceRoutes);
+    app.register(PoisRoutes);
+    app.register(zonesRoutes);
+    app.register(UserRoutes);
+    app.register(navigationRoutes);
+    app.register(salesStatsRoutes);
 }
