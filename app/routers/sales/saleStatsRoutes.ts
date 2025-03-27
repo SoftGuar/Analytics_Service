@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { SalesStatsHandler } from "../handlers/salesStatsHandler";
+import { SalesStatsHandler } from "../../handlers/salesStatsHandler";
 
 // filepath: c:\Users\KHALED\Documents\GitHub\Analytics_service\app\routers\saleStatsRoutes.ts
 

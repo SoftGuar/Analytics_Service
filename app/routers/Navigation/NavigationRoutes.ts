@@ -4,9 +4,10 @@ import {
     getMostReroutingRequests,
     getSuccessfulNavigations
 } from "../../handlers/Navigation/NavigationHandler";
+import { navigationSchemas } from "./NavigationSchemas";
 
 export async function navigationRoutes(fastify: FastifyInstance) {
-    fastify.get("/navigation/logs", getNavigationLogs);
-    fastify.get("/navigation/most-rerouting-requests", getMostReroutingRequests);
-    fastify.get("/navigation/successful", getSuccessfulNavigations);
+    fastify.get("/navigation/logs",navigationSchemas.NavigationLogsSchema , getNavigationLogs);
+    fastify.get("/navigation/most-rerouting-requests",navigationSchemas.MostReroutingRequestsSchema, getMostReroutingRequests);
+    fastify.get("/navigation/successful",navigationSchemas.SuccessfulNavigationsSchema, getSuccessfulNavigations);
 }

@@ -1,29 +1,27 @@
-import { PrismaClient as MainPrismaClient } from '../prisma/generated/main';
-import { PrismaClient as AnalyticsClient } from '../prisma/generated/anayltics';
+import { PrismaClient as MainPrismaClient } from "../prisma/generated/main";
+import { PrismaClient as AnalyticsClient } from "../prisma/generated/anayltics";
 const prisma = new MainPrismaClient();
 const analyticsPrisma = new AnalyticsClient();
 
-export class InterventionService{
-    static async getInterventionAverageDuration(){
-        try {
-            const result = await prisma.$queryRaw
-            <{avg_repair_time: number}>
-            `
+export class InterventionService {
+  static async getInterventionAverageDuration() {
+    try {
+      const result = await prisma.$queryRaw<{ avg_repair_time: number }>`
             SELECT AVG(EXTRACT(EPOCH FROM end_date) - EXTRACT(EPOCH FROM start_date)) AS avg_repair_time
             FROM "Intervention"
             WHERE end_date IS NOT NULL;
-            `
-            return result;
-        } catch (error) {
-            console.error("Error fetching intervention average duration:", error);
-            throw error;
-        }
+            `;
+      return result;
+    } catch (error) {
+      console.error("Error fetching intervention average duration:", error);
+      throw error;
     }
-    static async getMonthlyAverageDuration() {
-        try {
-            const result = await prisma.$queryRaw<
-                { month: number; year: number; average_duration: number }[]
-            >`
+  }
+  static async getMonthlyAverageDuration() {
+    try {
+      const result = await prisma.$queryRaw<
+        { month: number; year: number; average_duration: number }[]
+      >`
             SELECT
                 EXTRACT(YEAR FROM start_date) AS year,
                 EXTRACT(MONTH FROM start_date) AS month,
@@ -33,18 +31,18 @@ export class InterventionService{
             GROUP BY year, month
             ORDER BY year, month;
             `;
-    
-            return result;
-        } catch (error) {
-            console.error("Error fetching monthly average duration:", error);
-            throw error;
-        }
+
+      return result;
+    } catch (error) {
+      console.error("Error fetching monthly average duration:", error);
+      throw error;
     }
-    static async getMaintainerInterventionCount() {
-        try {
-            const result = await prisma.$queryRaw
-            <{maintainer_id: number; intervention_count: number}[]>
-            `
+  }
+  static async getMaintainerInterventionCount() {
+    try {
+      const result = await prisma.$queryRaw<
+        { maintainer_id: number; intervention_count: number }[]
+      >`
             SELECT
             "idMaintainer" AS maintainer_id,
             COUNT(*) AS intervention_count
@@ -52,18 +50,22 @@ export class InterventionService{
             "Intervention"
             GROUP BY
             "idMaintainer";
-            `
-            return result;
-        } catch (error) {
-            console.error("Error fetching maintainer intervention count:", error);
-            throw error;
-        }
+            `;
+      return result;
+    } catch (error) {
+      console.error("Error fetching maintainer intervention count:", error);
+      throw error;
     }
-    static async getAverageAnswerTime() {
-        try {
-            const result = await prisma.$queryRaw
-            <{issue_id: number; maintainer_id: number; avg_response_time_minutes: number}[]>
-            `
+  }
+  static async getAverageAnswerTime() {
+    try {
+      const result = await prisma.$queryRaw<
+        {
+          issue_id: number;
+          maintainer_id: number;
+          avg_response_time_minutes: number;
+        }[]
+      >`
             SELECT 
             d.id AS issue_id,
             i."idMaintainer" AS maintainer_id,
@@ -73,13 +75,15 @@ export class InterventionService{
             WHERE i.start_date IS NOT NULL
             GROUP BY d.id, i."idMaintainer"
             ORDER BY avg_response_time_minutes ASC;
-            `
-            return result;
-        } catch (error) {
-            console.error("Error fetching average answer time:", error);
-            throw error;
-        }
+            `;
+      return result;
+    } catch (error) {
+      console.error("Error fetching average answer time:", error);
+      throw error;
     }
+  }
 }
 
-InterventionService.getAverageAnswerTime().then((result) => console.log(result));
+InterventionService.getAverageAnswerTime().then((result) =>
+  console.log(result)
+);

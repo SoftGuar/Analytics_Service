@@ -1,5 +1,5 @@
-import { PrismaClient as MainPrismaClient } from '../prisma/generated/main';
-import { PrismaClient as AnalyticsClient } from '../prisma/generated/anayltics';
+import { PrismaClient as MainPrismaClient } from "../prisma/generated/main";
+import { PrismaClient as AnalyticsClient } from "../prisma/generated/anayltics";
 const prisma = new MainPrismaClient();
 const analyticsPrisma = new AnalyticsClient();
 
@@ -30,7 +30,7 @@ export class ZonesService {
       throw error;
     }
   }
-  static async getAverageTimeSpentInZones(){
+  static async getAverageTimeSpentInZones() {
     try {
       const result = await analyticsPrisma.$queryRaw<
         { zone_id: number; avg_time_seconds: number }[]
@@ -43,13 +43,13 @@ export class ZonesService {
             GROUP BY "zone_id"
             ORDER BY avg_time_seconds DESC;
             `;
-        return result;
+      return result;
     } catch (error) {
       console.error("Error calculating average time spent in zones:", error);
       throw error;
     }
   }
-  static async getZonesWithHighestObstacleCount(){
+  static async getZonesWithHighestObstacleCount() {
     try {
       const result = await analyticsPrisma.$queryRaw<
         { zone_id: number; total_obstacles: number }[]
@@ -60,11 +60,10 @@ export class ZonesService {
           ORDER BY total_obstacles DESC
           LIMIT 5;
             `;
-        return result;
+      return result;
     } catch (error) {
       console.error("Error fetching zones with highest obstacle count:", error);
       throw error;
     }
   }
-  
 }

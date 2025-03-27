@@ -4,9 +4,21 @@ import {
     getAverageTimeSpentHandler,
     getHighestObstaclesHandler,
 } from "../../handlers/Zone/ZonesHandler";
-
+import { zoneSchemas } from "./ZoneSchemas";
 export async function zonesRoutes(fastify: FastifyInstance) {
-    fastify.get("/zones/top-visited", getTopVisitedZonesHandler);
-    fastify.get("/zones/average-time-spent", getAverageTimeSpentHandler);
-    fastify.get("/zones/highest-obstacles", getHighestObstaclesHandler);
+    fastify.get(
+        "/zones/top-visited",
+        { schema: zoneSchemas.TopVisitedZonesSchema.schema },
+        getTopVisitedZonesHandler
+    );
+    fastify.get(
+        "/zones/average-time-spent",
+        { schema: zoneSchemas.AverageTimeSpentInZonesSchema.schema },
+        getAverageTimeSpentHandler
+    );
+    fastify.get(
+        "/zones/highest-obstacles",
+        { schema: zoneSchemas.ZonesWithHighestObstacleCountSchema.schema },
+        getHighestObstaclesHandler
+    );
 }

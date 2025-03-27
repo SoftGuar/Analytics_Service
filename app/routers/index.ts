@@ -4,7 +4,7 @@ import { DeviceRoutes } from './devices/DeviceRoutes';
 import { PoisRoutes } from './POIs/PoisRoutes';
 import { zonesRoutes } from './Zone/ZonesRoutes';
 import { UserRoutes } from './Users/UserRoutes';
-import { salesStatsRoutes } from './saleStatsRoutes';
+import { salesStatsRoutes } from './sales/saleStatsRoutes';
 
 export default async function (app: FastifyInstance) {
     //stats routes

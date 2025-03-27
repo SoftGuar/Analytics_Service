@@ -1,9 +1,9 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 dotenv.config();
 
-import { PrismaClient as MainPrismaClient } from '../prisma/generated/main';
-import { PrismaClient as AnalyticsClient } from '../prisma/generated/anayltics';
+import { PrismaClient as MainPrismaClient } from "../prisma/generated/main";
+import { PrismaClient as AnalyticsClient } from "../prisma/generated/anayltics";
 const prisma = new MainPrismaClient();
 const analyticsPrisma = new AnalyticsClient();
 
@@ -19,9 +19,9 @@ export async function checkDatabaseConnection() {
   try {
     await prisma.$connect();
     await analyticsPrisma.$connect();
-    console.log('Database connection established');
+    console.log("Database connection established");
   } catch (error) {
-    console.error('Failed to connect to database:', error);
+    console.error("Failed to connect to database:", error);
     process.exit(1);
   }
 }

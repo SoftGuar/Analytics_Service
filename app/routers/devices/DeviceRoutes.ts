@@ -1,13 +1,13 @@
 import { FastifyInstance } from "fastify";
 import { DeviceHandler } from "../../handlers/devices/DeviceHandler";
-
+import { deviceSchemas } from "./deviceRoutesSchemas";
 export async function DeviceRoutes(fastify: FastifyInstance) {
-    fastify.get("/device/status", DeviceHandler.getDeviceStatus);
-    fastify.get("/device/issues", DeviceHandler.getDeviceIssuesOverTime);
-    fastify.get("/device/performance", DeviceHandler.getDevicePerformance);
-    fastify.get("/device/issues/list", DeviceHandler.getDeviceIssues);
-    fastify.get("/device/sold", DeviceHandler.devicesSold);
-    fastify.get("/device/revenue", DeviceHandler.deviceRevenue);
-    fastify.get("/device/popular", DeviceHandler.getMostPopularDevices);
-    fastify.get("/device/interventions", DeviceHandler.getDeviceIntervention);
+    fastify.get("/device/status",deviceSchemas.DeviceStatusSchema, DeviceHandler.getDeviceStatus);
+    fastify.get("/device/issues",deviceSchemas.DeviceIssuesOverTimeSchema, DeviceHandler.getDeviceIssuesOverTime);
+    fastify.get("/device/performance",deviceSchemas.DevicePerformanceSchema, DeviceHandler.getDevicePerformance);
+    fastify.get("/device/issues/list",deviceSchemas.DeviceIssuesSchema, DeviceHandler.getDeviceIssues);
+    fastify.get("/device/sold", deviceSchemas.DevicesSoldSchema ,DeviceHandler.devicesSold);
+    fastify.get("/device/revenue", deviceSchemas.DeviceRevenueSchema ,DeviceHandler.deviceRevenue);
+    fastify.get("/device/popular",deviceSchemas.MostPopularDevicesSchema, DeviceHandler.getMostPopularDevices);
+    fastify.get("/device/interventions",deviceSchemas.DeviceInterventionSchema, DeviceHandler.getDeviceIntervention);
 }

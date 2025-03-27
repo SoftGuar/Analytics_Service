@@ -1,14 +1,19 @@
-import { PrismaClient as MainPrismaClient } from '../../prisma/generated/main';
-import { PrismaClient as AnalyticsClient } from '../../prisma/generated/anayltics';
+import { PrismaClient as MainPrismaClient } from "../../prisma/generated/main";
+import { PrismaClient as AnalyticsClient } from "../../prisma/generated/anayltics";
 const prisma = new MainPrismaClient();
 const analyticsPrisma = new AnalyticsClient();
 
 export class DeviceService {
-    static async getDeviceStatus(){
-        try {
-            const result = await analyticsPrisma.$queryRaw
-            <{dispositive_id: number; connected: boolean; timestamp: Date; battery_level: number}[]>
-            `
+  static async getDeviceStatus() {
+    try {
+      const result = await analyticsPrisma.$queryRaw<
+        {
+          dispositive_id: number;
+          connected: boolean;
+          timestamp: Date;
+          battery_level: number;
+        }[]
+      >`
             SELECT d1.dispositive_id, d1.connected, d1.timestamp, d1.battery_level
             FROM "DeviceUsageLogs" d1
             WHERE d1.timestamp = (
@@ -16,18 +21,18 @@ export class DeviceService {
                 FROM "DeviceUsageLogs" d2
                 WHERE d1.dispositive_id = d2.dispositive_id
             );
-`
-            return result;
-        } catch (error) {
-            console.error("Error fetching device status:", error);
-            throw error;
-        }
+`;
+      return result;
+    } catch (error) {
+      console.error("Error fetching device status:", error);
+      throw error;
     }
-    static async getDeviceIssuesOverTime(){
-        try {
-            const result = await prisma.$queryRaw
-            <{dispositive_id: number; issue_count: number}[]>
-            `
+  }
+  static async getDeviceIssuesOverTime() {
+    try {
+      const result = await prisma.$queryRaw<
+        { dispositive_id: number; issue_count: number }[]
+      >`
             SELECT 
             DATE_TRUNC('month', di.date) AS month,
             d.type,
@@ -36,92 +41,100 @@ export class DeviceService {
             JOIN "Dispositive" d ON di.dispositiveId = d.id
             GROUP BY DATE_TRUNC('month', di.date), d.type
             ORDER BY month, d.type;
-            `
-            return result;
-        } catch (error) {
-            console.error("Error fetching device issues over time:", error);
-            throw error;
-        }
+            `;
+      return result;
+    } catch (error) {
+      console.error("Error fetching device issues over time:", error);
+      throw error;
     }
-    static async getDeviceIssues(){
-        try {
-            const deviceIssueFrequency = await prisma.dispoIssue.groupBy({
-                by: ['dispositiveId'],
-                _count: {
-                  id: true
-                },
-                orderBy: {
-                  _count: {
-                    id: 'desc'
-                  }
-                },
-              });
-            return deviceIssueFrequency;
-        } catch (error) {
-            console.error("Error fetching device issues:", error);
-            throw error;
-        }
+  }
+  static async getDeviceIssues() {
+    try {
+      const deviceIssueFrequency = await prisma.dispoIssue.groupBy({
+        by: ["dispositiveId"],
+        _count: {
+          id: true,
+        },
+        orderBy: {
+          _count: {
+            id: "desc",
+          },
+        },
+      });
+      return deviceIssueFrequency;
+    } catch (error) {
+      console.error("Error fetching device issues:", error);
+      throw error;
     }
-    static async getDevicePerformance(){  
-        try{
-            const dispositiveIssues = await prisma.dispositive.findMany({
-                include: {
-                    DispotiveIssue: {
-                        select: {
-                            id: true,
-                            date: true,
-                            dispositiveId: true
-                        }
-                    },
-                    Product: {
-                        select: {
-                            name: true
-                        }
-                    }
-                }
-            });
-            
-              // Query device usage logs from analytics database
-              const deviceUsageLogs = await analyticsPrisma.deviceUsageLogs.findMany();
-            
-              // Merge and process data in application code
-              const devicePerformance = dispositiveIssues.map(device => {
-                // Calculate average battery level
-                const deviceLogs = deviceUsageLogs.filter(log => log.dispositive_id === device.id);
-                const avgBatteryLevel = deviceLogs.length 
-                  ? deviceLogs.reduce((sum, log) => sum + log.battery_level, 0) / deviceLogs.length 
-                  : null;
-            
-                // Calculate total issues and average days to first issue
-                const totalIssues = device.DispotiveIssue.length;
-                const avgDaysToFirstIssue = totalIssues > 0
-                  ? device.DispotiveIssue.reduce((sum, issue) => {
-                      const daysDiff = (new Date(issue.date).getTime() - new Date(device.start_date).getTime()) / (1000 * 3600 * 24);
-                      return sum + daysDiff;
-                    }, 0) / totalIssues
-                  : null;
-            
-                return {
-                  device_id: device.id,
-                  device_mac: device.MAC,
-                  avg_battery_level: avgBatteryLevel,
-                  total_issues: totalIssues,
-                  avg_days_to_first_issue: avgDaysToFirstIssue
-                };
-              }).sort((a, b) => (b.total_issues || 0) - (a.total_issues || 0));
-            
-              return devicePerformance;
-        }
-        catch(error){
-            console.error("Error fetching device performance:", error);
-            throw error;
-        }
+  }
+  static async getDevicePerformance() {
+    try {
+      const dispositiveIssues = await prisma.dispositive.findMany({
+        include: {
+          DispotiveIssue: {
+            select: {
+              id: true,
+              date: true,
+              dispositiveId: true,
+            },
+          },
+          Product: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+
+      // Query device usage logs from analytics database
+      const deviceUsageLogs = await analyticsPrisma.deviceUsageLogs.findMany();
+
+      // Merge and process data in application code
+      const devicePerformance = dispositiveIssues
+        .map((device) => {
+          // Calculate average battery level
+          const deviceLogs = deviceUsageLogs.filter(
+            (log) => log.dispositive_id === device.id
+          );
+          const avgBatteryLevel = deviceLogs.length
+            ? deviceLogs.reduce((sum, log) => sum + log.battery_level, 0) /
+              deviceLogs.length
+            : null;
+
+          // Calculate total issues and average days to first issue
+          const totalIssues = device.DispotiveIssue.length;
+          const avgDaysToFirstIssue =
+            totalIssues > 0
+              ? device.DispotiveIssue.reduce((sum, issue) => {
+                  const daysDiff =
+                    (new Date(issue.date).getTime() -
+                      new Date(device.start_date).getTime()) /
+                    (1000 * 3600 * 24);
+                  return sum + daysDiff;
+                }, 0) / totalIssues
+              : null;
+
+          return {
+            device_id: device.id,
+            device_mac: device.MAC,
+            avg_battery_level: avgBatteryLevel,
+            total_issues: totalIssues,
+            avg_days_to_first_issue: avgDaysToFirstIssue,
+          };
+        })
+        .sort((a, b) => (b.total_issues || 0) - (a.total_issues || 0));
+
+      return devicePerformance;
+    } catch (error) {
+      console.error("Error fetching device performance:", error);
+      throw error;
     }
-    static async devicesSold(){
-        try{
-            const devicesSold = await prisma.$queryRaw
-            < {sale_month: Date; devices_sold: number; total_revenue: number}[]>
-            `
+  }
+  static async devicesSold() {
+    try {
+      const devicesSold = await prisma.$queryRaw<
+        { sale_month: Date; devices_sold: number; total_revenue: number }[]
+      >`
             -- Track device sales by month
             SELECT 
                 DATE_TRUNC('month', t.date) AS sale_month,
@@ -138,19 +151,23 @@ export class DeviceService {
             GROUP BY 
                 sale_month
             ORDER BY 
-                sale_month;`
-            return devicesSold;
-        }
-        catch(error){
-            console.error("Error fetching device sales:", error);
-            throw error;
-        }
+                sale_month;`;
+      return devicesSold;
+    } catch (error) {
+      console.error("Error fetching device sales:", error);
+      throw error;
     }
-    static async deviceRevenue(){
-        try{
-            const deviceRevenue = await prisma.$queryRaw
-            <{sale_period: Date; devices_sold: number; total_revenue: number; avg_device_price: number}[]>
-            `
+  }
+  static async deviceRevenue() {
+    try {
+      const deviceRevenue = await prisma.$queryRaw<
+        {
+          sale_period: Date;
+          devices_sold: number;
+          total_revenue: number;
+          avg_device_price: number;
+        }[]
+      >`
             SELECT 
                 CASE 
                     WHEN DATE_TRUNC('month', t.date) IS NULL THEN 'Total'
@@ -172,19 +189,18 @@ export class DeviceService {
             ORDER BY 
                 sale_period;
 
-            `
-            return deviceRevenue;
-        }
-        catch(error){
-            console.error("Error fetching device revenue:", error);
-            throw error;
-        }
+            `;
+      return deviceRevenue;
+    } catch (error) {
+      console.error("Error fetching device revenue:", error);
+      throw error;
     }
-    static async getMostPopularDevices(){
-        try{
-            const mostPopularDevices = await prisma.$queryRaw
-            <{device_id: number; device_mac: string; issue_count: number}[]>
-            `
+  }
+  static async getMostPopularDevices() {
+    try {
+      const mostPopularDevices = await prisma.$queryRaw<
+        { device_id: number; device_mac: string; issue_count: number }[]
+      >`
             -- Ranking of device types by sales and usage
             SELECT 
                 p.name AS product_name,
@@ -202,19 +218,18 @@ export class DeviceService {
                 p.name
             ORDER BY 
                 sales_count DESC, total_revenue DESC;
-            `
-            return mostPopularDevices;
-        }
-        catch(error){
-            console.error("Error fetching most popular devices:", error);
-            throw error;
-        }
+            `;
+      return mostPopularDevices;
+    } catch (error) {
+      console.error("Error fetching most popular devices:", error);
+      throw error;
     }
-    static async getDeviceIntervention(){
-        try{
-            const deviceIntervention = await prisma.$queryRaw
-            <{device_id: number; intervention_count: number}[]>
-            `
+  }
+  static async getDeviceIntervention() {
+    try {
+      const deviceIntervention = await prisma.$queryRaw<
+        { device_id: number; intervention_count: number }[]
+      >`
             -- Track interventions by month and type
             SELECT 
                 DATE_TRUNC('month', date) AS intervention_month,
@@ -227,12 +242,11 @@ export class DeviceService {
                 intervention_month, type
             ORDER BY 
                 intervention_month, type;
-            `
-            return deviceIntervention;
-        }
-        catch(error){
-            console.error("Error fetching device interventions:", error);
-            throw error;
-        }
+            `;
+      return deviceIntervention;
+    } catch (error) {
+      console.error("Error fetching device interventions:", error);
+      throw error;
     }
+  }
 }
