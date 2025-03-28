@@ -2,6 +2,18 @@ import { PrismaClient as MainPrismaClient } from "../../prisma/generated/main";
 import { PrismaClient as AnalyticsClient } from "../../prisma/generated/anayltics";
 
 export class DeviceService {
+  static async getDeviceTotal(
+    prisma: MainPrismaClient = new MainPrismaClient()
+  ){
+    try{
+      const result = await prisma.dispositive.count();
+      return result;
+    }
+    catch(error:any){
+      console.error("Error fetching device total:", error);
+      throw error;
+    }
+  }
   static async getDeviceStatus(
     analyticsPrisma: AnalyticsClient = new AnalyticsClient()
   ) {

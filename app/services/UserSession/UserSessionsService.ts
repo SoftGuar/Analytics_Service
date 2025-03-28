@@ -3,6 +3,18 @@ import { PrismaClient as AnalyticsClient } from "../../prisma/generated/anayltic
 const prisma = new MainPrismaClient();
 const analyticsPrisma = new AnalyticsClient();
 export class UserSessionsService {
+  static async getTotalUsers(
+    prisma: MainPrismaClient = new MainPrismaClient()
+  ){
+    try{
+      const result = await prisma.user.count();
+      return result;
+    }
+    catch(error:any){
+      console.error("Error fetching total users:", error);
+      throw error;
+    }
+  }
   static async getTopUsers(
     analyticsPrisma: AnalyticsClient = new AnalyticsClient()
   ): Promise<
