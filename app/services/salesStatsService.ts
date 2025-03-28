@@ -10,6 +10,7 @@ export class SalesStatsService {
       >`
         WITH CustomerClassification AS (
           SELECT 
+          id,
             CASE 
               WHEN created_at >= NOW() - INTERVAL '30 days' THEN 'new'
               ELSE 'existing'
@@ -17,8 +18,8 @@ export class SalesStatsService {
           FROM "User"
         )
         SELECT 
-          COUNT(DISTINCT CASE WHEN customer_type = 'new' THEN 1 END)::Integer AS new_customers,
-          COUNT(DISTINCT CASE WHEN customer_type = 'existing' THEN 1 END)::Integer AS existing_customers
+          COUNT(DISTINCT CASE WHEN customer_type = 'new' THEN id END)::Integer AS new_customers,
+          COUNT(DISTINCT CASE WHEN customer_type = 'existing' THEN id END)::Integer AS existing_customers
         FROM CustomerClassification;
     `;
 
@@ -27,13 +28,13 @@ export class SalesStatsService {
       
       // Prevent division by zero
       const totalCustomers = new_customers + existing_customers;
+      console.log("totalCustomers", totalCustomers);
       if (totalCustomers === 0) {
         return 0;
       }
 
       // Calculate Customer Retention Rate (CRR)
       const crr = (existing_customers / totalCustomers) * 100;
-      
       return Number(crr.toFixed(2)); // Round to 2 decimal places
     } catch (error) {
       console.error("Error calculating Customer Retention Rate:", error);
@@ -56,6 +57,7 @@ export class SalesStatsService {
       >`
         WITH CustomerClassification AS (
           SELECT 
+          id,
             CASE 
               WHEN created_at >= NOW() - INTERVAL '30 days' THEN 'new'
               ELSE 'existing'
@@ -63,10 +65,10 @@ export class SalesStatsService {
           FROM "User"
         )
         SELECT 
-          COUNT(DISTINCT CASE WHEN customer_type = 'new' THEN 1 END)::Integer AS new_customers,
-          COUNT(DISTINCT CASE WHEN customer_type = 'existing' THEN 1 END)::Integer AS existing_customers,
-          COUNT(DISTINCT 1)::Integer AS total_customers,
-          (COUNT(DISTINCT CASE WHEN customer_type = 'existing' THEN 1 END) * 100.0 / 
+          COUNT(DISTINCT CASE WHEN customer_type = 'new' THEN id END)::Integer AS new_customers,
+          COUNT(DISTINCT CASE WHEN customer_type = 'existing' THEN id END)::Integer AS existing_customers,
+          COUNT(DISTINCT id)::Integer AS total_customers,
+          (COUNT(DISTINCT CASE WHEN customer_type = 'existing' THEN id END) * 100.0 / 
            NULLIF(COUNT(DISTINCT 1), 0))::Numeric(5,2) AS retention_rate
         FROM CustomerClassification;
     `;

@@ -18,7 +18,7 @@ export class NavigationService {
   ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
-        { environment_id: number; reroute_count: number }[]
+        { environment_id: number; rerouting_count: number }[]
       >`
                 SELECT environment_id,rerouting_count
                 FROM "Navigation_logs"

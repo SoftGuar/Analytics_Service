@@ -35,13 +35,13 @@ export class UserSessionsService {
     analyticsPrisma: AnalyticsClient = new AnalyticsClient()
   ) {
     try {
-      const result = await analyticsPrisma.$queryRaw<{
-        overall_avg_rating: number;
-      }>`
+      const result = await analyticsPrisma.$queryRaw<
+       {overall_avg_rating: number}[]
+      >`
                 SELECT AVG("rating") AS overall_avg_rating
                 FROM "Feedback";
                 `;
-      return result;
+      return result[0];
     } catch (error) {
       console.error("Error fetching user ratings:", error);
       throw error;

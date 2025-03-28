@@ -32,9 +32,9 @@ export const navigationSchemas = {
                         type: 'object',
                         properties: {
                             environment_id: { type: 'number' },
-                            reroute_count: { type: 'number' }
+                            rerouting_count: { type: 'number' }
                         },
-                        required: ['environment_id', 'reroute_count']
+                        required: ['environment_id', 'rerouting_count']
                     }
                 }
             }

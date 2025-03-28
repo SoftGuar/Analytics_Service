@@ -58,7 +58,7 @@ describe('UserSessionsService', () => {
 
             const result = await UserSessionsService.getUserRatings(analyticsPrisma);
 
-            expect(result).toEqual(mockResult);
+            expect(result).toEqual(mockResult[0]);
             expect(analyticsPrisma.$queryRaw).toHaveBeenCalledTimes(1);
         });
 

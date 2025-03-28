@@ -41,7 +41,7 @@ export class DeviceService {
             d.type,
             COUNT(di.id) AS issue_count
             FROM "DispoIssue" di
-            JOIN "Dispositive" d ON di.dispositiveId = d.id
+            JOIN "Dispositive" d ON di."dispositiveId" = d.id
             GROUP BY DATE_TRUNC('month', di.date), d.type
             ORDER BY month, d.type;
             `;
@@ -247,7 +247,7 @@ export class DeviceService {
         { device_id: number; intervention_count: number }[]
       >`
             SELECT 
-                DATE_TRUNC('month', date) AS intervention_month,
+                DATE_TRUNC('month', start_date) AS intervention_month,
                 type,
                 COUNT(*)::Integer AS intervention_count,
                 AVG(CASE WHEN status = 'Resolved' THEN 1 ELSE 0 END)::Integer AS resolution_rate

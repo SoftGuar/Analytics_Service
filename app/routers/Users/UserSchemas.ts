@@ -45,11 +45,10 @@ export const userSchemas = {
                         properties: {
                             id: { type: 'number' },
                             user_id: { type: 'number' },
-                            feedback: { type: 'string' },
                             rating: { type: 'number' },
                             created_at: { type: 'string', format: 'date-time' }
                         },
-                        required: ['id', 'user_id', 'feedback', 'rating', 'created_at']
+                        required: ['id', 'user_id', 'rating', 'created_at']
                     }
                 }
             }
