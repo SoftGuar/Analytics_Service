@@ -40,14 +40,14 @@ model Decider {
 }
 
 model DispoIssue {
-  id            Int        @id @default(autoincrement())
+  id            Int         @id @default(autoincrement())
   dispositiveId Int
   description   String
-  date          DateTime   @default(now())
-  status        String
-  maintainerId  Int
-  Maintainer    Maintainer @relation(fields: [maintainerId], references: [id])
+  date          DateTime    @default(now())
+  status        String      @default("pending")
+  maintainerId  Int?
   Dispositive   Dispositive @relation(fields: [dispositiveId], references: [id])
+  Maintainer    Maintainer? @relation(fields: [maintainerId], references: [id])
 }
 
 model Dispositive {
@@ -60,10 +60,11 @@ model Dispositive {
   state              String
   user_id            Int?
   product_id         Int
+  DispotiveIssue     DispoIssue[]
   Product            Product              @relation(fields: [product_id], references: [id], onDelete: Cascade)
   User               User?                @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  Intervention       Intervention[]
   ProductTransaction ProductTransaction[]
-  DispotiveIssue     DispoIssue[]
 }
 
 model Helper {
@@ -77,17 +78,17 @@ model Helper {
 }
 
 model Intervention {
-  idMaintainer Int
-  idUser       Int
-  description  String
-  start_date         DateTime   @default(now())
+  idMaintainer       Int
+  description        String
+  type               String
   end_date           DateTime
-  type         String
-  status       String
-  Maintainer   Maintainer @relation(fields: [idMaintainer], references: [id])
-  User         User       @relation(fields: [idUser], references: [id])
-
-  @@id([idMaintainer, idUser])
+  start_date         DateTime            @default(now())
+  id                 Int                 @id @default(autoincrement())
+  status             InterventionStatus  @default(pending)
+  idDispositive      Int
+  Dispositive        Dispositive         @relation(fields: [idDispositive], references: [id])
+  Maintainer         Maintainer          @relation(fields: [idMaintainer], references: [id])
+  InterventionReport InterventionReport?
 }
 
 model Maintainer {
@@ -159,16 +160,31 @@ model Transaction {
 }
 
 model User {
-  id           Int            @id @default(autoincrement())
-  email        String         @unique
-  first_name   String
-  last_name    String
-  password     String
-  phone        String?
-  created_at   DateTime       @default(now())
-  Dispositive  Dispositive[]
-  Intervention Intervention[]
-  Quotation    Quotation[]
-  Transaction  Transaction[]
-  Helper       Helper[]       @relation("UserHelpers")
+  id          Int           @id @default(autoincrement())
+  email       String        @unique
+  first_name  String
+  last_name   String
+  password    String
+  phone       String?
+  created_at  DateTime      @default(now())
+  Dispositive Dispositive[]
+  Quotation   Quotation[]
+  Transaction Transaction[]
+  Helper      Helper[]      @relation("UserHelpers")
+}
+
+model InterventionReport {
+  id             Int          @id @default(autoincrement())
+  interventionId Int          @unique
+  title          String
+  description    String
+  created_at     DateTime     @default(now())
+  Intervention   Intervention @relation(fields: [interventionId], references: [id], onDelete: Cascade)
+}
+
+enum InterventionStatus {
+  done
+  inProgress
+  pending
+  rescheduled
 }
