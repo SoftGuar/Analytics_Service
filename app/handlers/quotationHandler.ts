@@ -8,9 +8,8 @@ export class QuotationHandler {
         try {
             const result = await quotationService.countConvertedQuotations();
             reply.status(200).send(result);
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : "Unknown error";
-            reply.status(500).send({ error: errorMessage });
+        } catch (error: any) {
+            reply.status(500).send({ error: error.message });
         }
     }
 
@@ -18,9 +17,8 @@ export class QuotationHandler {
         try {
             const result = await quotationService.averageTimeToConversion();
             reply.status(200).send({ averageTimeToConversion: result });
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : "Unknown error";
-            reply.status(500).send({ error: errorMessage });
+        } catch (error: any) {
+            reply.status(500).send({ error: error.message });
         }
     }
 
@@ -28,9 +26,8 @@ export class QuotationHandler {
         try {
             const result = await quotationService.mostFrequentlyQuotedProducts();
             reply.status(200).send(result);
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : "Unknown error";
-            reply.status(500).send({ error: errorMessage });
+        } catch (error: any) {
+            reply.status(500).send({ error: error.message });
         }
     }
 
@@ -38,9 +35,8 @@ export class QuotationHandler {
         try {
             const result = await quotationService.productConversionRate();
             reply.status(200).send(result);
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : "Unknown error";
-            reply.status(500).send({ error: errorMessage });
+        } catch (error: any) {
+            reply.status(500).send({ error: error.message });
         }
     }
 
@@ -48,9 +44,8 @@ export class QuotationHandler {
         try {
             const result = await quotationService.totalQuotationValueByProduct();
             reply.status(200).send(result);
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : "Unknown error";
-            reply.status(500).send({ error: errorMessage });
+        } catch (error: any) {
+            reply.status(500).send({ error: error.message });
         }
     }
 
@@ -58,9 +53,8 @@ export class QuotationHandler {
         try {
             const result = await quotationService.clientsWithMostUnconvertedQuotations();
             reply.status(200).send(result);
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : "Unknown error";
-            reply.status(500).send({ error: errorMessage });
+        } catch (error: any) {
+            reply.status(500).send({ error: error.message });
         }
     }
 
@@ -68,9 +62,8 @@ export class QuotationHandler {
         try {
             const result = await quotationService.totalQuotationsCreated();
             reply.status(200).send({ totalQuotationsCreated: result });
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : "Unknown error";
-            reply.status(500).send({ error: errorMessage });
+        } catch (error: any) {
+            reply.status(500).send({ error: error.message });
         }
     }
 
@@ -78,9 +71,8 @@ export class QuotationHandler {
         try {
             const result = await quotationService.averageProductsPerQuotation();
             reply.status(200).send({ averageProductsPerQuotation: result });
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : "Unknown error";
-            reply.status(500).send({ error: errorMessage });
+        } catch (error: any) {
+            reply.status(500).send({ error: error.message });
         }
     }
 
@@ -88,9 +80,8 @@ export class QuotationHandler {
         try {
             const result = await quotationService.averageQuotationValue();
             reply.status(200).send({ averageQuotationValue: result });
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : "Unknown error";
-            reply.status(500).send({ error: errorMessage });
+        } catch (error: any) {
+            reply.status(500).send({ error: error.message });
         }
     }
 }

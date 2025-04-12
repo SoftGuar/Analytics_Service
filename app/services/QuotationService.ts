@@ -23,7 +23,7 @@ export class QuotationService {
     //Délai Moyen Entre Devis et Achat
     async averageTimeToConversion(): Promise<number | null> {
         const result = await prisma.$queryRaw<{ avg_time: number | null }[]>`
-            SELECT AVG(EXTRACT(EPOCH FROM (t.date - q.date)) / 86400) AS avg_time
+            SELECT AVG(EXTRACT(EPOCH FROM (t.created_at - q.created_at)) / 86400) AS avg_time
             FROM "Transaction" t
             INNER JOIN "Quotation" q ON t.user_id = q.user_id
         `;
