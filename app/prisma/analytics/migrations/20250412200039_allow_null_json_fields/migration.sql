@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Logs" ALTER COLUMN "error" DROP NOT NULL,
+ALTER COLUMN "request" DROP NOT NULL;

@@ -1,4 +1,4 @@
-import { PrismaClient } from "../prisma/generated/main";
+import { PrismaClient } from "../prisma/main/generated";
 
 export class SalesStatsService {
   async getCRR(

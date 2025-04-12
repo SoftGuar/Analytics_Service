@@ -1,8 +1,8 @@
 import { InterventionService } from '../services/interventionService';
-import { PrismaClient as MainPrismaClient } from '../prisma/generated/main';
+import { PrismaClient as MainPrismaClient } from "../prisma/main/generated";
 
 // Create a manual mock of the Main Prisma client
-jest.mock('../prisma/generated/main', () => {
+jest.mock('../prisma/main/generated', () => {
     return {
         PrismaClient: jest.fn().mockImplementation(() => ({
             $queryRaw: jest.fn(),

@@ -1,8 +1,8 @@
 import { NavigationService } from '../services/Navigation/NavigationService';
-import { PrismaClient as AnalyticsClient } from '../prisma/generated/anayltics';
+import { PrismaClient as AnalyticsClient } from "../prisma/analytics/generated";
 
 // Create a manual mock of the Analytics Prisma client
-jest.mock('../prisma/generated/anayltics', () => {
+jest.mock('../prisma/analytics/generated', () => {
     return {
         PrismaClient: jest.fn().mockImplementation(() => ({
             navigation_logs: {

@@ -6,12 +6,13 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../prisma/generated/anayltics"
+  output   = "./generated"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Navigation_logs {
@@ -69,4 +70,17 @@ model UserSessions {
   session_end   DateTime?
   device_id  Int?
   ip_address String?
+}
+
+model Logs {
+  id         Int       @id @default(autoincrement())
+  level      String    @db.VarChar(10)
+  time       DateTime
+  pid        Int
+  hostname   String    @db.VarChar(255)
+  msg        String
+  error      Json?  
+  request    Json?  
+  full_log   Json
+  created_at DateTime  @default(now())
 }

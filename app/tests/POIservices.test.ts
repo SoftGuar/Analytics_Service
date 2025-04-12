@@ -1,7 +1,7 @@
 import { POIsService } from '../services/POIs/POIsService';
 
 // Create a manual mock of the AnalyticsClient
-jest.mock('../prisma/generated/anayltics', () => {
+jest.mock('../prisma/analytics/generated', () => {
   return {
     PrismaClient: jest.fn().mockImplementation(() => ({
       pOI_logs: {
@@ -10,7 +10,7 @@ jest.mock('../prisma/generated/anayltics', () => {
     }))
   };
 });
-import { PrismaClient as AnalyticsClient } from '../prisma/generated/anayltics';
+import { PrismaClient as AnalyticsClient } from "../prisma/analytics/generated";
 
 describe('POIsService', () => {
   let analyticsPrisma: jest.Mocked<AnalyticsClient>;

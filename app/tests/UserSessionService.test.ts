@@ -1,8 +1,8 @@
 import { UserSessionsService } from '../services/UserSession/UserSessionsService';
-import { PrismaClient as AnalyticsClient } from '../prisma/generated/anayltics';
+import { PrismaClient as AnalyticsClient } from "../prisma/analytics/generated";
 
 // Create a manual mock of the Analytics Prisma client
-jest.mock('../prisma/generated/anayltics', () => {
+jest.mock('../prisma/analytics/generated', () => {
     return {
         PrismaClient: jest.fn().mockImplementation(() => ({
             userSessions: {

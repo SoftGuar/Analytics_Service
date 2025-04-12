@@ -2,8 +2,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-import { PrismaClient as MainPrismaClient } from "../prisma/generated/main";
-import { PrismaClient as AnalyticsClient } from "../prisma/generated/anayltics";
+import { PrismaClient as MainPrismaClient } from "../prisma/main/generated";
+import { PrismaClient as AnalyticsClient } from "../prisma/analytics/generated";
 const prisma = new MainPrismaClient();
 const analyticsPrisma = new AnalyticsClient();
 

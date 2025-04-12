@@ -1,5 +1,5 @@
-import { PrismaClient as MainPrismaClient } from "../../prisma/generated/main";
-import { PrismaClient as AnalyticsClient } from "../../prisma/generated/anayltics";
+import { PrismaClient as MainPrismaClient } from "../../prisma/main/generated";
+import { PrismaClient as AnalyticsClient } from "../../prisma/analytics/generated";
 
 export class DeviceService {
   static async getDeviceTotal(

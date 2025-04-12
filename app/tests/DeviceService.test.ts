@@ -1,9 +1,9 @@
 import { DeviceService } from '../services/devices/DeviceService';
-import { PrismaClient as MainPrismaClient } from '../prisma/generated/main';
-import { PrismaClient as AnalyticsClient } from '../prisma/generated/anayltics';
+import { PrismaClient as MainPrismaClient } from "../prisma/main/generated";
+import { PrismaClient as AnalyticsClient } from "../prisma/analytics/generated";
 
 // Create a manual mock of the Prisma clients
-jest.mock('../prisma/generated/main', () => {
+jest.mock('../prisma/main/generated', () => {
     return {
         PrismaClient: jest.fn().mockImplementation(() => ({
             dispoIssue: {
@@ -17,7 +17,7 @@ jest.mock('../prisma/generated/main', () => {
     };
 });
 
-jest.mock('../prisma/generated/anayltics', () => {
+jest.mock('../prisma/analytics/generated', () => {
     return {
         PrismaClient: jest.fn().mockImplementation(() => ({
             $queryRaw: jest.fn(),
