@@ -1,9 +1,12 @@
 import { PrismaClient as MainPrismaClient } from "../../prisma/main/generated";
 import { PrismaClient as AnalyticsClient } from "../../prisma/analytics/generated";
-
+const prisma = new MainPrismaClient();
+const analyticsPrisma = new AnalyticsClient();
 export class DeviceService {
+  private static prisma: MainPrismaClient = prisma
+  private static analyticsPrisma: AnalyticsClient = analyticsPrisma
   static async getDeviceTotal(
-    prisma: MainPrismaClient = new MainPrismaClient()
+    prisma: MainPrismaClient = DeviceService.prisma
   ){
     try{
       const result = await prisma.dispositive.count();
@@ -15,7 +18,7 @@ export class DeviceService {
     }
   }
   static async getDeviceStatus(
-    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+    analyticsPrisma: AnalyticsClient = DeviceService.analyticsPrisma
   ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
@@ -42,7 +45,7 @@ export class DeviceService {
   }
 
   static async getDeviceIssuesOverTime(
-    prisma: MainPrismaClient = new MainPrismaClient()
+    prisma: MainPrismaClient = DeviceService.prisma
   ) {
     try {
       const result = await prisma.$queryRaw<
@@ -65,7 +68,7 @@ export class DeviceService {
   }
 
   static async getDeviceIssues(
-    prisma: MainPrismaClient = new MainPrismaClient()
+    prisma: MainPrismaClient = DeviceService.prisma
   ) {
     try {
       const deviceIssueFrequency = await prisma.dispoIssue.groupBy({
@@ -87,8 +90,8 @@ export class DeviceService {
   }
 
   static async getDevicePerformance(
-    prisma: MainPrismaClient = new MainPrismaClient(),
-    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+    prisma: MainPrismaClient = DeviceService.prisma,
+    analyticsPrisma: AnalyticsClient =DeviceService.analyticsPrisma
   ) {
     try {
       const dispositiveIssues = await prisma.dispositive.findMany({
@@ -150,7 +153,7 @@ export class DeviceService {
   }
 
   static async devicesSold(
-    prisma: MainPrismaClient = new MainPrismaClient()
+    prisma: MainPrismaClient = DeviceService.prisma
   ) {
     try {
       const devicesSold = await prisma.$queryRaw<
@@ -180,7 +183,7 @@ export class DeviceService {
   }
 
   static async deviceRevenue(
-    prisma: MainPrismaClient = new MainPrismaClient()
+    prisma: MainPrismaClient = DeviceService.prisma
   ) {
     try {
       const deviceRevenue = await prisma.$queryRaw<
@@ -221,7 +224,7 @@ export class DeviceService {
   }
 
   static async getMostPopularDevices(
-    prisma: MainPrismaClient = new MainPrismaClient()
+    prisma: MainPrismaClient = DeviceService.prisma
   ) {
     try {
       const mostPopularDevices = await prisma.$queryRaw<
@@ -252,7 +255,7 @@ export class DeviceService {
   }
 
   static async getDeviceIntervention(
-    prisma: MainPrismaClient = new MainPrismaClient()
+    prisma: MainPrismaClient = DeviceService.prisma
   ) {
     try {
       const deviceIntervention = await prisma.$queryRaw<

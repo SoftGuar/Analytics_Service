@@ -1,8 +1,8 @@
 import { PrismaClient } from "../prisma/main/generated";
-
+const prismaMain = new PrismaClient();
 export class SalesStatsService {
   async getCRR(
-    prisma: PrismaClient = new PrismaClient()
+    prisma: PrismaClient = prismaMain
   ) {
     try {
       const result = await prisma.$queryRaw<
@@ -44,7 +44,7 @@ export class SalesStatsService {
 
   // Optional: Add method to get more detailed retention insights
   async getCustomerRetentionDetails(
-    prisma: PrismaClient = new PrismaClient()
+    prisma: PrismaClient = prismaMain
   ) {
     try {
       const result = await prisma.$queryRaw<

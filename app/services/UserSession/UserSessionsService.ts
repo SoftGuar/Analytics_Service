@@ -1,9 +1,10 @@
 import { PrismaClient as MainPrismaClient } from "../../prisma/main/generated";
 import { PrismaClient as AnalyticsClient } from "../../prisma/analytics/generated";
-
+const prisma = new MainPrismaClient();
+const analyticsPrisma = new AnalyticsClient();
 export class UserSessionsService {
-  private static prisma = new MainPrismaClient();
-  private static analyticsPrisma = new AnalyticsClient();
+  private static prisma = prisma;
+  private static analyticsPrisma = analyticsPrisma;
   static async getTotalUsers(
     prisma: MainPrismaClient = UserSessionsService.prisma
   ){

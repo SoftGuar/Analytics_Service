@@ -1,11 +1,10 @@
 import { PrismaClient as MainPrismaClient } from "../prisma/main/generated";
 import { PrismaClient as AnalyticsClient } from "../prisma/analytics/generated";
-const prisma = new MainPrismaClient();
-const analyticsPrisma = new AnalyticsClient();
+const analyticsPrismaclient = new AnalyticsClient();
 
 export class ZonesService {
   static async getTopVisitedZones(
-    analyticsPrisma: AnalyticsClient = new AnalyticsClient
+    analyticsPrisma: AnalyticsClient =analyticsPrismaclient
   ): Promise<
     { zone_id: number; visit_count: number }[]
   > {
@@ -33,7 +32,7 @@ export class ZonesService {
     }
   }
   static async getAverageTimeSpentInZones(
-    analyticsPrisma: AnalyticsClient = new AnalyticsClient
+    analyticsPrisma: AnalyticsClient = analyticsPrismaclient
   ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
@@ -54,7 +53,7 @@ export class ZonesService {
     }
   }
   static async getZonesWithHighestObstacleCount(
-    analyticsPrisma: AnalyticsClient = new AnalyticsClient
+    analyticsPrisma: AnalyticsClient = analyticsPrismaclient
   ) {
     try {
       const result = await analyticsPrisma.$queryRaw<

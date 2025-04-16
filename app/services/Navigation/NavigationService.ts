@@ -4,7 +4,8 @@ const prisma = new MainPrismaClient();
 const analyticsPrisma = new AnalyticsClient();
 
 export class NavigationService {
-  static async getAllNavigationLogs(analyticsPrisma: AnalyticsClient = new AnalyticsClient()) {
+  private static prisma: AnalyticsClient = analyticsPrisma;
+  static async getAllNavigationLogs(analyticsPrisma: AnalyticsClient = NavigationService.prisma) {
     try {
       const result = await analyticsPrisma.navigation_logs.findMany();
       return result;
@@ -14,7 +15,7 @@ export class NavigationService {
     }
   }
   static async getMostReroutingRequests(
-    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+    analyticsPrisma: AnalyticsClient = NavigationService.prisma
   ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
@@ -32,7 +33,7 @@ export class NavigationService {
     }
   }
   static async getSuccessfulNavigations(
-    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+    analyticsPrisma: AnalyticsClient = NavigationService.prisma
   ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
