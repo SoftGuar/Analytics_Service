@@ -4,8 +4,13 @@ const prisma = new MainPrismaClient();
 const analyticsPrisma = new AnalyticsClient();
 
 export class InterventionService {
+  private static prisma: MainPrismaClient = prisma;
+  private static analyticsPrisma: AnalyticsClient = analyticsPrisma;
+  static setPrismaClient(client: MainPrismaClient) {
+    this.prisma = client;
+  }
   static async getInterventionAverageDuration(
-    prisma: MainPrismaClient = new MainPrismaClient()
+    prisma: MainPrismaClient = InterventionService.prisma
   ) {
     try {
       const result = await prisma.$queryRaw<{ avg_repair_time: number }>`
@@ -19,8 +24,9 @@ export class InterventionService {
       throw error;
     }
   }
+
   static async getMonthlyAverageDuration(
-    prisma: MainPrismaClient = new MainPrismaClient()
+    prisma: MainPrismaClient = InterventionService.prisma
   ) {
     try {
       const result = await prisma.$queryRaw<
@@ -42,8 +48,9 @@ export class InterventionService {
       throw error;
     }
   }
+
   static async getMaintainerInterventionCount(
-    prisma: MainPrismaClient = new MainPrismaClient()
+    prisma: MainPrismaClient = InterventionService.prisma
   ) {
     try {
       const result = await prisma.$queryRaw<
@@ -63,8 +70,9 @@ export class InterventionService {
       throw error;
     }
   }
+
   static async getAverageAnswerTime(
-    prisma: MainPrismaClient = new MainPrismaClient()
+    prisma: MainPrismaClient = InterventionService.prisma
   ) {
     try {
       const result = await prisma.$queryRaw<
@@ -91,4 +99,3 @@ export class InterventionService {
     }
   }
 }
-

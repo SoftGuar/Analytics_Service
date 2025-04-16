@@ -84,3 +84,31 @@ model Logs {
   full_log   Json
   created_at DateTime  @default(now())
 }
+model ExecutiveReport {
+  id                Int       @id @default(autoincrement()) // Primary key
+  timestamp         DateTime  @default(now()) // Timestamp of the report
+  service        String @default("default")
+  cpu_manufacturer  String    // CPU manufacturer
+  cpu_brand         String    // CPU brand
+  cpu_cores         Int       // Number of CPU cores
+  cpu_speed         Float     // CPU speed
+  cpu_usage         Int       // CPU usage percentage
+  cpu_temperature   Float?    // CPU temperature (nullable)
+  memory_total      Float     // Total memory
+  memory_used       Float     // Used memory
+  memory_free       Float     // Free memory
+  memory_swap_used  Float     // Swap used memory
+  memory_cache      Float     // Cache memory
+  disk_total        Float     // Total disk space
+  disk_used         Float     // Used disk space
+  disk_free         Float     // Free disk space
+  disk_usage_percent Int      // Disk usage percentage
+  network_rx_sec    Float     // Network received data per second
+  network_tx_sec    Float     // Network transmitted data per second
+  network_errors    Int       // Network errors
+  network_dropped   Int       // Network dropped packets
+  system_uptime     Float     // System uptime
+  system_os         String    // Operating system
+  system_kernel     String    // Kernel version
+  system_hostname   String    // Hostname
+}
