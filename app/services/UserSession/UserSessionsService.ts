@@ -1,10 +1,11 @@
 import { PrismaClient as MainPrismaClient } from "../../prisma/main/generated";
 import { PrismaClient as AnalyticsClient } from "../../prisma/analytics/generated";
-const prisma = new MainPrismaClient();
-const analyticsPrisma = new AnalyticsClient();
+
 export class UserSessionsService {
+  private static prisma = new MainPrismaClient();
+  private static analyticsPrisma = new AnalyticsClient();
   static async getTotalUsers(
-    prisma: MainPrismaClient = new MainPrismaClient()
+    prisma: MainPrismaClient = UserSessionsService.prisma
   ){
     try{
       const result = await prisma.user.count();
@@ -16,7 +17,7 @@ export class UserSessionsService {
     }
   }
   static async getTopUsers(
-    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+    analyticsPrisma: AnalyticsClient = UserSessionsService.analyticsPrisma
   ): Promise<
     { user_id: number; session_count: number }[]
   > {
@@ -44,7 +45,7 @@ export class UserSessionsService {
     }
   }
   static async getUserRatings(
-    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+    analyticsPrisma: AnalyticsClient = UserSessionsService.analyticsPrisma
   ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
@@ -60,7 +61,7 @@ export class UserSessionsService {
     }
   }
   static async getUserFeedback(
-    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+    analyticsPrisma: AnalyticsClient = UserSessionsService.analyticsPrisma
   ) {
     try {
       const result = await analyticsPrisma.feedback.findMany();
@@ -71,7 +72,7 @@ export class UserSessionsService {
     }
   }
   static async getUserSessionDuration(
-    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+    analyticsPrisma: AnalyticsClient = UserSessionsService.analyticsPrisma
   ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
@@ -92,7 +93,7 @@ export class UserSessionsService {
     }
   }
   static async getDAUs(
-    analyticsPrisma: AnalyticsClient = new AnalyticsClient
+    analyticsPrisma: AnalyticsClient = UserSessionsService.analyticsPrisma
   ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
@@ -112,7 +113,7 @@ export class UserSessionsService {
     }
   }
   static async getMAUs(
-    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+    analyticsPrisma: AnalyticsClient = UserSessionsService.analyticsPrisma
   ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
@@ -132,7 +133,7 @@ export class UserSessionsService {
     }
   }
   static async getWAUs(
-    analyticsPrisma: AnalyticsClient = new AnalyticsClient()
+    analyticsPrisma: AnalyticsClient = UserSessionsService.analyticsPrisma
   ) {
     try {
       const result = await analyticsPrisma.$queryRaw<
