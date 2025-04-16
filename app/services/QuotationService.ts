@@ -43,17 +43,17 @@ export class QuotationService {
         return result;
     }
     // Taux de Conversion par Produit
-    async productConversionRate(): Promise<{ product_id: number, conversion_rate: number }[]> {
-        const result = await prisma.$queryRaw<{ product_id: number, conversion_rate: number }[]>
+    async productConversionRate(): Promise<{ dispositive_id: number, conversion_rate: number }[]> {
+        const result = await prisma.$queryRaw<{ dispositive_id: number, conversion_rate: number }[]>
         `
             SELECT 
-                pq.product_id,
-                (COUNT(DISTINCT pt.id) * 100.0 / NULLIF(COUNT(DISTINCT pq.quotation_id), 0)) AS conversion_rate
+                pq.product_id AS dispositive_id,
+                (COUNT(DISTINCT pt.transaction_id) * 100.0 / NULLIF(COUNT(DISTINCT pq.quotation_id), 0)) AS conversion_rate
             FROM "ProductQuotation" pq
             LEFT JOIN "Quotation" q ON pq.quotation_id = q.id
             LEFT JOIN "Transaction" t ON q.user_id = t.user_id
             LEFT JOIN "ProductTransaction" pt ON t.id = pt.transaction_id
-            WHERE pt.id IS NOT NULL
+            WHERE pt."isConfirmed" = true
             GROUP BY pq.product_id
             ORDER BY conversion_rate DESC
         `;

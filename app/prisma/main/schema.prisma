@@ -170,17 +170,18 @@ model Transaction {
 }
 
 model User {
-  id          Int           @id @default(autoincrement())
-  email       String        @unique
-  first_name  String
-  last_name   String
-  password    String
-  phone       String?
-  created_at  DateTime      @default(now())
-  Dispositive Dispositive[]
-  Quotation   Quotation[]
-  Transaction Transaction[]
-  Helper      Helper[]      @relation("UserHelpers")
+  id           Int            @id @default(autoincrement())
+  email        String         @unique
+  first_name   String
+  last_name    String
+  password     String
+  phone        String?
+  created_at   DateTime       @default(now())
+  Dispositive  Dispositive[]
+  Notification Notification[]
+  Quotation    Quotation[]
+  Transaction  Transaction[]
+  Helper       Helper[]       @relation("UserHelpers")
 }
 
 model InterventionReport {
@@ -190,6 +191,20 @@ model InterventionReport {
   description    String
   created_at     DateTime     @default(now())
   Intervention   Intervention @relation(fields: [interventionId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  type       String?
+  title      String
+  message    String
+  metadata   Json?
+  is_read    Boolean   @default(false)
+  created_at DateTime  @default(now())
+  sent_at    DateTime?
+  read_at    DateTime?
+  User       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 enum InterventionStatus {
