@@ -94,58 +94,59 @@ export class DeviceService {
     analyticsPrisma: AnalyticsClient =DeviceService.analyticsPrisma
   ) {
     try {
-      const dispositiveIssues = await prisma.dispositive.findMany({
-        include: {
-          DispotiveIssue: {
-            select: {
-              id: true,
-              created_at: true,
-              dispositiveId: true,
-            },
-          },
-          Product: {
-            select: {
-              name: true,
-            },
+      //count the number of issues for each device
+      const dispoIssuesCount = await prisma.dispoIssue.groupBy({
+        by: ["dispositiveId"],
+        _count: {
+          id: true,
+        },
+        orderBy: {
+          _count: {
+            id: "desc",
           },
         },
       });
-
-      const deviceUsageLogs = await analyticsPrisma.deviceUsageLogs.findMany();
-
-      const devicePerformance = dispositiveIssues
-        .map((device) => {
-          const deviceLogs = deviceUsageLogs.filter(
-            (log) => log.dispositive_id === device.id
-          );
-          const avgBatteryLevel = deviceLogs.length
-            ? deviceLogs.reduce((sum, log) => sum + log.battery_level, 0) /
-              deviceLogs.length
-            : null;
-
-          const totalIssues = device.DispotiveIssue.length;
-          const avgDaysToFirstIssue =
-            totalIssues > 0
-              ? device.DispotiveIssue.reduce((sum, issue) => {
-                  const daysDiff =
-                    (new Date(issue.created_at).getTime() -
-                      new Date(device.start_date).getTime()) /
-                    (1000 * 3600 * 24);
-                  return sum + daysDiff;
-                }, 0) / totalIssues
-              : null;
-
-          return {
-            device_id: device.id,
-            device_mac: device.MAC,
-            avg_battery_level: avgBatteryLevel,
-            total_issues: totalIssues,
-            avg_days_to_first_issue: avgDaysToFirstIssue,
-          };
-        })
-        .sort((a, b) => (b.total_issues || 0) - (a.total_issues || 0));
-
+      //count the number of interventions for each device
+      const dispoInterventionsCount = await prisma.intervention.groupBy({
+        by: ["idDispositive"],
+        _count: {
+          id: true,
+        },
+        orderBy: {
+          _count: {
+            id: "desc",
+          },
+        },
+      });
+      //average battery level for each device
+      const batteryLevel = await analyticsPrisma.deviceUsageLogs.groupBy({
+        by: ["dispositive_id"],
+        _avg: {
+          battery_level: true,
+        },
+        orderBy: {
+          _avg: {
+            battery_level: "desc",
+          },
+        },
+      });
+      //joing results based on device id
+      const devicePerformance = dispoIssuesCount.map((issue) => {
+        const intervention = dispoInterventionsCount.find(
+          (intervention) => intervention.idDispositive === issue.dispositiveId
+        );
+        const battery = batteryLevel.find(
+          (battery) => battery.dispositive_id === issue.dispositiveId
+        );
+        return {
+          device_id: issue.dispositiveId,
+          issues_count: issue._count.id,
+          interventions_count: intervention ? intervention._count.id : 0,
+          avg_battery_level: battery ? battery._avg.battery_level : 0,
+        };
+      });
       return devicePerformance;
+      
     } catch (error) {
       console.error("Error fetching device performance:", error);
       throw error;
