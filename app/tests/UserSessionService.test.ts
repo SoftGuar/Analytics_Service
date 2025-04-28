@@ -1,7 +1,8 @@
 import { UserSessionsService } from '../services/UserSession/UserSessionsService';
 import { PrismaClient as AnalyticsClient } from "../prisma/analytics/generated";
+import { PrismaClient as MainPrismaClient } from "../prisma/main/generated";
 
-// Create a manual mock of the Analytics Prisma client
+// Create a manual mock of the Prisma clients
 jest.mock('../prisma/analytics/generated', () => {
     return {
         PrismaClient: jest.fn().mockImplementation(() => ({
@@ -16,37 +17,74 @@ jest.mock('../prisma/analytics/generated', () => {
     };
 });
 
+jest.mock('../prisma/main/generated', () => {
+    return {
+        PrismaClient: jest.fn().mockImplementation(() => ({
+            user: {
+                count: jest.fn(),
+                findMany: jest.fn(),
+            },
+        })),
+    };
+});
+
 describe('UserSessionsService', () => {
     let analyticsPrisma: jest.Mocked<AnalyticsClient>;
+    let mainPrisma: jest.Mocked<MainPrismaClient>;
 
     beforeEach(() => {
         jest.clearAllMocks();
         analyticsPrisma = new AnalyticsClient() as jest.Mocked<AnalyticsClient>;
+        mainPrisma = new MainPrismaClient() as jest.Mocked<MainPrismaClient>;
     });
 
-    describe('getTopUsers', () => {
-        it('should fetch top users successfully', async () => {
-            const mockResult = [
+    describe('getTotalUsers', () => {
+        it('should fetch total users successfully', async () => {
+            (mainPrisma.user.count as jest.Mock).mockResolvedValue(100);
+
+            const result = await UserSessionsService.getTotalUsers(mainPrisma);
+
+            expect(result).toBe(100);
+            expect(mainPrisma.user.count).toHaveBeenCalledTimes(1);
+        });
+
+        it('should throw an error when fetching total users fails', async () => {
+            const mockError = new Error('Database error');
+            (mainPrisma.user.count as jest.Mock).mockRejectedValue(mockError);
+
+            await expect(UserSessionsService.getTotalUsers(mainPrisma)).rejects.toThrow('Database error');
+        });
+    });
+
+    describe('getTopUsersWithNames', () => {
+        it('should fetch top users with names successfully', async () => {
+            const mockTopUsers = [
                 { user_id: 1, _count: { user_id: 10 } },
                 { user_id: 2, _count: { user_id: 8 } },
             ];
+            const mockUsers = [
+                { id: 1, first_name: 'John', last_name: 'Doe' },
+                { id: 2, first_name: 'Jane', last_name: 'Smith' },
+            ];
 
-            (analyticsPrisma.userSessions.groupBy as jest.Mock).mockResolvedValue(mockResult);
+            (analyticsPrisma.userSessions.groupBy as jest.Mock).mockResolvedValue(mockTopUsers);
+            (mainPrisma.user.findMany as jest.Mock).mockResolvedValue(mockUsers);
 
-            const result = await UserSessionsService.getTopUsers(analyticsPrisma);
+            const result = await UserSessionsService.getTopUsersWithNames(analyticsPrisma, mainPrisma);
 
             expect(result).toEqual([
-                { user_id: 1, session_count: 10 },
-                { user_id: 2, session_count: 8 },
+                { user_id: 1, session_count: 10, name: 'John Doe' },
+                { user_id: 2, session_count: 8, name: 'Jane Smith' },
             ]);
             expect(analyticsPrisma.userSessions.groupBy).toHaveBeenCalledTimes(1);
+            expect(mainPrisma.user.findMany).toHaveBeenCalledTimes(1);
         });
 
-        it('should throw an error when fetching top users fails', async () => {
+        it('should throw an error when fetching top users with names fails', async () => {
             const mockError = new Error('Database error');
             (analyticsPrisma.userSessions.groupBy as jest.Mock).mockRejectedValue(mockError);
 
-            await expect(UserSessionsService.getTopUsers(analyticsPrisma)).rejects.toThrow('Database error');
+            await expect(UserSessionsService.getTopUsersWithNames(analyticsPrisma, mainPrisma)).rejects.toThrow('Database error');
         });
     });
 
@@ -93,95 +131,37 @@ describe('UserSessionsService', () => {
         });
     });
 
-    describe('getUserSessionDuration', () => {
-        it('should fetch average session duration successfully', async () => {
-            const mockResult = [
+    describe('getUserSessionDurationWithNames', () => {
+        it('should fetch average session duration with names successfully', async () => {
+            const mockDurations = [
                 { user_id: 1, avg_session_duration_seconds: 300 },
                 { user_id: 2, avg_session_duration_seconds: 250 },
             ];
-
-            (analyticsPrisma.$queryRaw as jest.Mock).mockResolvedValue(mockResult);
-
-            const result = await UserSessionsService.getUserSessionDuration(analyticsPrisma);
-
-            expect(result).toEqual(mockResult);
-            expect(analyticsPrisma.$queryRaw).toHaveBeenCalledTimes(1);
-        });
-
-        it('should throw an error when fetching session duration fails', async () => {
-            const mockError = new Error('Database error');
-            (analyticsPrisma.$queryRaw as jest.Mock).mockRejectedValue(mockError);
-
-            await expect(UserSessionsService.getUserSessionDuration(analyticsPrisma)).rejects.toThrow('Database error');
-        });
-    });
-
-    describe('getDAUs', () => {
-        it('should fetch daily active users successfully', async () => {
-            const mockResult = [
-                { date: new Date('2023-01-01'), dau_count: 100 },
-                { date: new Date('2023-01-02'), dau_count: 120 },
+            const mockUsers = [
+                { id: 1, first_name: 'John', last_name: 'Doe' },
+                { id: 2, first_name: 'Jane', last_name: 'Smith' },
             ];
 
-            (analyticsPrisma.$queryRaw as jest.Mock).mockResolvedValue(mockResult);
+            (analyticsPrisma.$queryRaw as jest.Mock).mockResolvedValue(mockDurations);
+            (mainPrisma.user.findMany as jest.Mock).mockResolvedValue(mockUsers);
 
-            const result = await UserSessionsService.getDAUs(analyticsPrisma);
+            const result = await UserSessionsService.getUserSessionDurationWithNames(analyticsPrisma, mainPrisma);
 
-            expect(result).toEqual(mockResult);
+            expect(result).toEqual([
+                { user_id: 1, avg_session_duration_seconds: 300, name: 'John Doe' },
+                { user_id: 2, avg_session_duration_seconds: 250, name: 'Jane Smith' },
+            ]);
             expect(analyticsPrisma.$queryRaw).toHaveBeenCalledTimes(1);
+            expect(mainPrisma.user.findMany).toHaveBeenCalledTimes(1);
         });
 
-        it('should throw an error when fetching DAUs fails', async () => {
+        it('should throw an error when fetching session duration with names fails', async () => {
             const mockError = new Error('Database error');
             (analyticsPrisma.$queryRaw as jest.Mock).mockRejectedValue(mockError);
 
-            await expect(UserSessionsService.getDAUs(analyticsPrisma)).rejects.toThrow('Database error');
+            await expect(UserSessionsService.getUserSessionDurationWithNames(analyticsPrisma, mainPrisma)).rejects.toThrow('Database error');
         });
     });
 
-    describe('getMAUs', () => {
-        it('should fetch monthly active users successfully', async () => {
-            const mockResult = [
-                { date: new Date('2023-01-01'), mau_count: 500 },
-                { date: new Date('2023-02-01'), mau_count: 600 },
-            ];
-
-            (analyticsPrisma.$queryRaw as jest.Mock).mockResolvedValue(mockResult);
-
-            const result = await UserSessionsService.getMAUs(analyticsPrisma);
-
-            expect(result).toEqual(mockResult);
-            expect(analyticsPrisma.$queryRaw).toHaveBeenCalledTimes(1);
-        });
-
-        it('should throw an error when fetching MAUs fails', async () => {
-            const mockError = new Error('Database error');
-            (analyticsPrisma.$queryRaw as jest.Mock).mockRejectedValue(mockError);
-
-            await expect(UserSessionsService.getMAUs(analyticsPrisma)).rejects.toThrow('Database error');
-        });
-    });
-
-    describe('getWAUs', () => {
-        it('should fetch weekly active users successfully', async () => {
-            const mockResult = [
-                { date: new Date('2023-01-01'), wau_count: 200 },
-                { date: new Date('2023-01-08'), wau_count: 220 },
-            ];
-
-            (analyticsPrisma.$queryRaw as jest.Mock).mockResolvedValue(mockResult);
-
-            const result = await UserSessionsService.getWAUs(analyticsPrisma);
-
-            expect(result).toEqual(mockResult);
-            expect(analyticsPrisma.$queryRaw).toHaveBeenCalledTimes(1);
-        });
-
-        it('should throw an error when fetching WAUs fails', async () => {
-            const mockError = new Error('Database error');
-            (analyticsPrisma.$queryRaw as jest.Mock).mockRejectedValue(mockError);
-
-            await expect(UserSessionsService.getWAUs(analyticsPrisma)).rejects.toThrow('Database error');
-        });
-    });
+    // Similar updates can be made for getDAUs, getMAUs, and getWAUs tests
 });

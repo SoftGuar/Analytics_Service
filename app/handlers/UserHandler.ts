@@ -13,7 +13,7 @@ export class UserHandler {
   }
   static async getTopUsers(req: FastifyRequest, reply: FastifyReply) {
     try {
-      const topUsers = await UserSessionsService.getTopUsers();
+      const topUsers = await UserSessionsService.getTopUsersWithNames();
       reply.status(200).send(topUsers);
     } catch (error) {
       console.error("Error in getTopUsers handler:", error);
@@ -47,7 +47,7 @@ export class UserHandler {
   ) {
     try {
       const sessionDurations =
-        await UserSessionsService.getUserSessionDuration();
+        await UserSessionsService.getUserSessionDurationWithNames();
       reply.status(200).send(sessionDurations);
     } catch (error) {
       console.error("Error in getUserSessionDuration handler:", error);

@@ -17,6 +17,8 @@ model Admin {
   phone      String?
   add_by     Int
   privilege  Int
+  created_at DateTime   @default(now())
+  updated_at DateTime   @default(now())
   SuperAdmin SuperAdmin @relation(fields: [add_by], references: [id], onDelete: Cascade)
 }
 
@@ -27,25 +29,30 @@ model Commercial {
   email       String        @unique
   password    String
   phone       String?
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @default(now())
   Transaction Transaction[]
 }
 
 model Decider {
-  id         Int     @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   first_name String
   last_name  String
-  email      String  @unique
+  email      String   @unique
   password   String
   phone      String?
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
 }
 
 model DispoIssue {
   id            Int         @id @default(autoincrement())
   dispositiveId Int
   description   String
-  date          DateTime    @default(now())
   status        String      @default("pending")
   maintainerId  Int?
+  created_at    DateTime    @default(now())
+  updated_at    DateTime    @default(now())
   Dispositive   Dispositive @relation(fields: [dispositiveId], references: [id])
   Maintainer    Maintainer? @relation(fields: [maintainerId], references: [id])
 }
@@ -61,7 +68,7 @@ model Dispositive {
   user_id            Int?
   product_id         Int
   created_at         DateTime             @default(now())
-  updated_at         DateTime
+  updated_at         DateTime             @default(now())
   DispotiveIssue     DispoIssue[]
   Product            Product              @relation(fields: [product_id], references: [id], onDelete: Cascade)
   User               User?                @relation(fields: [user_id], references: [id], onDelete: Cascade)
@@ -70,13 +77,15 @@ model Dispositive {
 }
 
 model Helper {
-  id         Int     @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   first_name String
   last_name  String
-  email      String  @unique
+  email      String   @unique
   password   String
   phone      String?
-  User       User[]  @relation("UserHelpers")
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  User       User[]   @relation("UserHelpers")
 }
 
 model Intervention {
@@ -88,6 +97,8 @@ model Intervention {
   id                 Int                 @id @default(autoincrement())
   status             InterventionStatus  @default(pending)
   idDispositive      Int
+  created_at         DateTime            @default(now())
+  updated_at         DateTime            @default(now())
   Dispositive        Dispositive         @relation(fields: [idDispositive], references: [id])
   Maintainer         Maintainer          @relation(fields: [idMaintainer], references: [id])
   InterventionReport InterventionReport?
@@ -100,6 +111,8 @@ model Maintainer {
   email        String         @unique
   password     String
   phone        String?
+  created_at   DateTime       @default(now())
+  updated_at   DateTime       @default(now())
   DispoIssue   DispoIssue[]
   Intervention Intervention[]
 }
@@ -110,7 +123,7 @@ model Product {
   description      String?
   price            Float
   created_at       DateTime           @default(now())
-  updated_at       DateTime
+  updated_at       DateTime           @default(now())
   Dispositive      Dispositive[]
   ProductQuotation ProductQuotation[]
 }
@@ -149,12 +162,14 @@ model Quotation {
 }
 
 model SuperAdmin {
-  id         Int     @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   first_name String
   last_name  String
-  email      String  @unique
+  email      String   @unique
   password   String
   phone      String?
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
   Admin      Admin[]
 }
 
@@ -170,18 +185,21 @@ model Transaction {
 }
 
 model User {
-  id           Int            @id @default(autoincrement())
-  email        String         @unique
-  first_name   String
-  last_name    String
-  password     String
-  phone        String?
-  created_at   DateTime       @default(now())
-  Dispositive  Dispositive[]
-  Notification Notification[]
-  Quotation    Quotation[]
-  Transaction  Transaction[]
-  Helper       Helper[]       @relation("UserHelpers")
+  id                   Int                    @id @default(autoincrement())
+  email                String                 @unique
+  first_name           String
+  last_name            String
+  password             String
+  phone                String?
+  created_at           DateTime               @default(now())
+  updated_at           DateTime               @default(now())
+  MAC                  String
+  Dispositive          Dispositive[]
+  HelperRecommendation HelperRecommendation[]
+  Notification         Notification[]
+  Quotation            Quotation[]
+  Transaction          Transaction[]
+  Helper               Helper[]               @relation("UserHelpers")
 }
 
 model InterventionReport {
@@ -190,6 +208,7 @@ model InterventionReport {
   title          String
   description    String
   created_at     DateTime     @default(now())
+  updated_at     DateTime     @default(now())
   Intervention   Intervention @relation(fields: [interventionId], references: [id], onDelete: Cascade)
 }
 
@@ -205,6 +224,31 @@ model Notification {
   sent_at    DateTime?
   read_at    DateTime?
   User       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model Assistance {
+  id         Int      @id @default(autoincrement())
+  first_name String
+  last_name  String
+  email      String   @unique
+  password   String
+  phone      String?
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+
+model HelperRecommendation {
+  id         Int      @id @default(autoincrement())
+  first_name String
+  last_name  String
+  email      String
+  phone      String?
+  status     String   @default("pending")
+  user_id    Int
+  notes      String?
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  User       User     @relation(fields: [user_id], references: [id])
 }
 
 enum InterventionStatus {

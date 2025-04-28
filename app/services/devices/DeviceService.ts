@@ -52,12 +52,12 @@ export class DeviceService {
         { dispositive_id: number; issue_count: number }[]
       >`
             SELECT 
-            DATE_TRUNC('month', di.date) AS month,
+            DATE_TRUNC('month', di.created_at) AS month,
             d.type,
             COUNT(di.id) AS issue_count
             FROM "DispoIssue" di
             JOIN "Dispositive" d ON di."dispositiveId" = d.id
-            GROUP BY DATE_TRUNC('month', di.date), d.type
+            GROUP BY DATE_TRUNC('month', di.created_at), d.type
             ORDER BY month, d.type;
             `;
       return result;
@@ -99,7 +99,7 @@ export class DeviceService {
           DispotiveIssue: {
             select: {
               id: true,
-              date: true,
+              created_at: true,
               dispositiveId: true,
             },
           },
@@ -128,7 +128,7 @@ export class DeviceService {
             totalIssues > 0
               ? device.DispotiveIssue.reduce((sum, issue) => {
                   const daysDiff =
-                    (new Date(issue.date).getTime() -
+                    (new Date(issue.created_at).getTime() -
                       new Date(device.start_date).getTime()) /
                     (1000 * 3600 * 24);
                   return sum + daysDiff;
@@ -160,7 +160,7 @@ export class DeviceService {
         { sale_month: Date; devices_sold: number; total_revenue: number }[]
       >`
             SELECT 
-                DATE_TRUNC('month', t.date) AS sale_month,
+                DATE_TRUNC('month', t.created_at) AS sale_month,
                 COUNT(DISTINCT pt.dispositive_id)::Integer AS devices_sold,
                 SUM(p.price)::Integer AS total_revenue
             FROM 
@@ -196,8 +196,8 @@ export class DeviceService {
       >`
             SELECT 
                 CASE 
-                    WHEN DATE_TRUNC('month', t.date) IS NULL THEN 'Total'
-                    ELSE TO_CHAR(DATE_TRUNC('month', t.date), 'YYYY-MM')
+                    WHEN DATE_TRUNC('month', t.created_at) IS NULL THEN 'Total'
+                    ELSE TO_CHAR(DATE_TRUNC('month', t.created_at), 'YYYY-MM')
                 END AS sale_period,
                 COUNT(DISTINCT pt.dispositive_id)::Integer AS devices_sold,
                 SUM(p.price)::Integer AS total_revenue,
@@ -211,7 +211,7 @@ export class DeviceService {
             JOIN 
                 "Product" p ON d.product_id = p.id
             GROUP BY 
-                ROLLUP(DATE_TRUNC('month', t.date))
+                ROLLUP(DATE_TRUNC('month', t.created_at))
             ORDER BY 
                 sale_period;
 

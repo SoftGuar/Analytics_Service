@@ -85,7 +85,7 @@ export class InterventionService {
             SELECT 
             d.id AS issue_id,
             i."idMaintainer" AS maintainer_id,
-            AVG(EXTRACT(EPOCH FROM (i.start_date - d.date)) / 60) AS avg_response_time_minutes
+            AVG(EXTRACT(EPOCH FROM (i.start_date - d.created_at)) / 60) AS avg_response_time_minutes
             FROM "DispoIssue" d
             JOIN "Intervention" i ON d."maintainerId" = i."idMaintainer"
             WHERE i.start_date IS NOT NULL

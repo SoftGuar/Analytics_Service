@@ -32,62 +32,69 @@ export class QuotationService {
     }    
     
     // Produits les plus souvent ajoutés aux devis
-    async mostFrequentlyQuotedProducts(): Promise<{ product_id: number, count: number }[]> {
-        const result = await prisma.$queryRaw<{ product_id: number, count: number }[]>
+    async mostFrequentlyQuotedProducts(): Promise<{ product_id: number, product_name: string, count: number }[]> {
+        const result = await prisma.$queryRaw<{ product_id: number, product_name: string, count: number }[]>
         `
-            SELECT product_id, COUNT(product_id) AS count
-            FROM "ProductQuotation"
-            GROUP BY product_id
+            SELECT 
+                pq.product_id, 
+                p.name AS product_name, 
+                COUNT(pq.product_id) AS count
+            FROM "ProductQuotation" pq
+            INNER JOIN "Product" p ON pq.product_id = p.id
+            GROUP BY pq.product_id, p.name
             ORDER BY count DESC
         `;
         return result;
     }
     // Taux de Conversion par Produit
-    async productConversionRate(): Promise<{ dispositive_id: number, conversion_rate: number }[]> {
-        const result = await prisma.$queryRaw<{ dispositive_id: number, conversion_rate: number }[]>
+    async productConversionRate(): Promise<{ product_name: string, conversion_rate: number }[]> {
+        const result = await prisma.$queryRaw<{ product_name: string, conversion_rate: number }[]>
         `
             SELECT 
-                pq.product_id AS dispositive_id,
+                p.name AS product_name,
                 (COUNT(DISTINCT pt.transaction_id) * 100.0 / NULLIF(COUNT(DISTINCT pq.quotation_id), 0)) AS conversion_rate
             FROM "ProductQuotation" pq
             LEFT JOIN "Quotation" q ON pq.quotation_id = q.id
             LEFT JOIN "Transaction" t ON q.user_id = t.user_id
             LEFT JOIN "ProductTransaction" pt ON t.id = pt.transaction_id
+            INNER JOIN "Product" p ON pq.product_id = p.id
             WHERE pt."isConfirmed" = true
-            GROUP BY pq.product_id
+            GROUP BY p.name
             ORDER BY conversion_rate DESC
         `;
         return result;
     }
     
     // Valeur totale des devis par produit
-    async totalQuotationValueByProduct(): Promise<{ product_id: number, total_value: number }[]> {
-        const result = await prisma.$queryRaw<{ product_id: number, total_value: number }[]>
+    async totalQuotationValueByProduct(): Promise<{ product_name: string, total_value: number }[]> {
+        const result = await prisma.$queryRaw<{ product_name: string, total_value: number }[]>
         `
             SELECT 
-                pq.product_id, 
+                p.name AS product_name, 
                 SUM(pq.count * p.price) AS total_value
             FROM "ProductQuotation" pq
             INNER JOIN "Product" p ON pq.product_id = p.id
-            GROUP BY pq.product_id
+            GROUP BY p.name
             ORDER BY total_value DESC
         `;
         return result;
     }
     // Clients avec le plus de devis non convertis
     //Permet d’identifier les clients intéressés mais qui n’achètent pas.
-    async clientsWithMostUnconvertedQuotations(): Promise<{ user_id: number, unconverted_count: number }[]> {
-        const result = await prisma.$queryRaw<{ user_id: number, unconverted_count: number }[]>
+    async clientsWithMostUnconvertedQuotations(): Promise<{ user_last_name: string, user_first_name: string, unconverted_count: number }[]> {
+        const result = await prisma.$queryRaw<{ user_last_name: string, user_first_name: string, unconverted_count: number }[]>
         `
             SELECT 
-                q.user_id, 
+                u.last_name AS user_last_name, 
+                u.first_name AS user_first_name,
                 COUNT(q.id) AS unconverted_count
             FROM "Quotation" q
+            INNER JOIN "User" u ON q.user_id = u.id
             WHERE q.user_id NOT IN (
                 SELECT DISTINCT t.user_id 
                 FROM "Transaction" t
             )
-            GROUP BY q.user_id
+            GROUP BY u.last_name, u.first_name
             ORDER BY unconverted_count DESC
         `;
         return result;

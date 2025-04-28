@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "./generated"
@@ -12,40 +6,37 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
 model Navigation_logs {
-  id              Int            @id @default(autoincrement())
+  id              Int         @id @default(autoincrement())
   user_id         Int
   environment_id  Int
   rerouting_count Int
   start_time      DateTime
   end_time        DateTime?
-  zoneLogs        Zone_logs[]
   poiLogs         POI_logs[]
+  zoneLogs        Zone_logs[]
 }
 
 model Zone_logs {
-  id                  Int         @id @default(autoincrement())
-  navigation_id       Int
-  zone_id             Int
-  user_id             Int
-  start_time          DateTime
-  end_time            DateTime
+  id                    Int             @id @default(autoincrement())
+  navigation_id         Int
+  zone_id               Int
+  user_id               Int
+  start_time            DateTime
+  end_time              DateTime
   obstacles_encountered Int
-
-  navigation          Navigation_logs @relation(fields: [navigation_id], references: [id])
-  }
+  navigation            Navigation_logs @relation(fields: [navigation_id], references: [id])
+}
 
 model POI_logs {
-  id            Int   @id @default(autoincrement())
+  id            Int             @id @default(autoincrement())
   navigation_id Int
   poi_id        Int
   visit_time    DateTime
-
   navigation    Navigation_logs @relation(fields: [navigation_id], references: [id])
- }
+}
 
 model DeviceUsageLogs {
   id             Int      @id @default(autoincrement())
@@ -56,59 +47,60 @@ model DeviceUsageLogs {
 }
 
 model Feedback {
-  id        Int      @id @default(autoincrement())
-  user_id   Int
-  rating    Int      // 1-5 étoiles
-  comment   String?
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  rating     Int
+  comment    String?
   created_at DateTime @default(now())
 }
 
 model UserSessions {
-  id         Int      @id @default(autoincrement())
-  user_id    Int
-  session_start DateTime @default(now())
+  id            Int       @id @default(autoincrement())
+  user_id       Int
+  session_start DateTime  @default(now())
   session_end   DateTime?
-  device_id  Int?
-  ip_address String?
+  device_id     Int?
+  ip_address    String?
 }
 
 model Logs {
-  id         Int       @id @default(autoincrement())
-  level      String    @db.VarChar(10)
+  id         Int      @id @default(autoincrement())
+  level      String   @db.VarChar(10)
   time       DateTime
   pid        Int
-  hostname   String    @db.VarChar(255)
+  hostname   String   @db.VarChar(255)
   msg        String
-  error      Json?  
-  request    Json?  
+  error      Json?
+  request    Json?
   full_log   Json
-  created_at DateTime  @default(now())
+  created_at DateTime @default(now())
 }
+
 model ExecutiveReport {
-  id                Int       @id @default(autoincrement()) // Primary key
-  timestamp         DateTime  @default(now()) // Timestamp of the report
-  service        String @default("default")
-  cpu_manufacturer  String    // CPU manufacturer
-  cpu_brand         String    // CPU brand
-  cpu_cores         Int       // Number of CPU cores
-  cpu_speed         Float     // CPU speed
-  cpu_usage         Int       // CPU usage percentage
-  cpu_temperature   Float?    // CPU temperature (nullable)
-  memory_total      Float     // Total memory
-  memory_used       Float     // Used memory
-  memory_free       Float     // Free memory
-  memory_swap_used  Float     // Swap used memory
-  memory_cache      Float     // Cache memory
-  disk_total        Float     // Total disk space
-  disk_used         Float     // Used disk space
-  disk_free         Float     // Free disk space
-  disk_usage_percent Int      // Disk usage percentage
-  network_rx_sec    Float     // Network received data per second
-  network_tx_sec    Float     // Network transmitted data per second
-  network_errors    Int       // Network errors
-  network_dropped   Int       // Network dropped packets
-  system_uptime     Float     // System uptime
-  system_os         String    // Operating system
-  system_kernel     String    // Kernel version
-  system_hostname   String    // Hostname
+  id                 Int      @id @default(autoincrement())
+  timestamp          DateTime @default(now())
+  cpu_manufacturer   String
+  cpu_brand          String
+  cpu_cores          Int
+  cpu_speed          Float
+  cpu_usage          Int
+  cpu_temperature    Float?
+  memory_total       Float
+  memory_used        Float
+  memory_free        Float
+  memory_swap_used   Float
+  memory_cache       Float
+  disk_total         Float
+  disk_used          Float
+  disk_free          Float
+  disk_usage_percent Int
+  network_rx_sec     Float
+  network_tx_sec     Float
+  network_errors     Int
+  network_dropped    Int
+  system_uptime      Float
+  system_os          String
+  system_kernel      String
+  system_hostname    String
+  service            String   @default("default")
 }

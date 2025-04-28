@@ -1,22 +1,19 @@
 export const userSchemas = {
-    UserTotalSchema:{
+    UserTotalSchema: {
         schema: {
             description: 'Get the total number of users',
             tags: ['Users'],
             response: {
                 200: {
-                    type: 'object',
-                    properties: {
-                        total_users: { type: 'number' }
-                    },
-                    required: ['total_users']
+                    type: 'number',
+                    description: 'Total number of users'
                 }
             }
         }
     },
     TopUsersSchema: {
         schema: {
-            description: 'Get the top 10 users with the most sessions',
+            description: 'Get the top 10 users with the most sessions and their names',
             tags: ['Users'],
             response: {
                 200: {
@@ -25,7 +22,8 @@ export const userSchemas = {
                         type: 'object',
                         properties: {
                             user_id: { type: 'number' },
-                            session_count: { type: 'number' }
+                            session_count: { type: 'number' },
+                            name: { type: 'string', nullable: true }
                         },
                         required: ['user_id', 'session_count']
                     }
@@ -71,7 +69,7 @@ export const userSchemas = {
     },
     UserSessionDurationSchema: {
         schema: {
-            description: 'Get the average session duration for each user',
+            description: 'Get the average session duration for each user with their names',
             tags: ['Users'],
             response: {
                 200: {
@@ -80,7 +78,8 @@ export const userSchemas = {
                         type: 'object',
                         properties: {
                             user_id: { type: 'number' },
-                            avg_session_duration_seconds: { type: 'number' }
+                            avg_session_duration_seconds: { type: 'number' },
+                            name: { type: 'string', nullable: true }
                         },
                         required: ['user_id', 'avg_session_duration_seconds']
                     }

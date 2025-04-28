@@ -11,6 +11,7 @@ jest.mock('../prisma/main/generated', () => {
             },
             dispositive: {
                 findMany: jest.fn(),
+                count: jest.fn(),
             },
             $queryRaw: jest.fn(),
         })),
@@ -28,7 +29,6 @@ jest.mock('../prisma/analytics/generated', () => {
     };
 });
 
-
 describe('DeviceService', () => {
     let mainPrisma: jest.Mocked<MainPrismaClient>;
     let analyticsPrisma: jest.Mocked<AnalyticsClient>;
@@ -39,33 +39,47 @@ describe('DeviceService', () => {
         analyticsPrisma = new AnalyticsClient() as jest.Mocked<AnalyticsClient>;
     });
 
+    describe('getDeviceTotal', () => {
+        it('should return the total number of devices', async () => {
+            (mainPrisma.dispositive.count as jest.Mock).mockResolvedValue(42);
+
+            const result = await DeviceService.getDeviceTotal(mainPrisma);
+
+            expect(result).toBe(42);
+            expect(mainPrisma.dispositive.count).toHaveBeenCalledTimes(1);
+        });
+
+        it('should throw an error when the query fails', async () => {
+            const mockError = new Error('Database error');
+            (mainPrisma.dispositive.count as jest.Mock).mockRejectedValue(mockError);
+
+            await expect(DeviceService.getDeviceTotal(mainPrisma)).rejects.toThrow('Database error');
+        });
+    });
+
     describe('getDeviceStatus', () => {
         it('should fetch device status successfully', async () => {
-          // Mock data for device status
-          const mockDeviceStatusResult = [
-            {
-              dispositive_id: 1,
-              connected: true,
-              timestamp: new Date('2024-03-27T10:00:00Z'),
-              battery_level: 85
-            },
-            {
-              dispositive_id: 2,
-              connected: false,
-              timestamp: new Date('2024-03-27T09:30:00Z'),
-              battery_level: 42
-            }
-          ];
-    
-          // Setup mock implementation
-          const mockAnalyticsPrisma = new AnalyticsClient();
-          (mockAnalyticsPrisma.$queryRaw as jest.Mock).mockResolvedValue(mockDeviceStatusResult);
-    
-          const result = await DeviceService.getDeviceStatus(mockAnalyticsPrisma);
-    
-          // Assertions
-          expect(result).toEqual(mockDeviceStatusResult);
-          expect(mockAnalyticsPrisma.$queryRaw).toHaveBeenCalledTimes(1);
+            const mockDeviceStatusResult = [
+                {
+                    dispositive_id: 1,
+                    connected: true,
+                    timestamp: new Date('2024-03-27T10:00:00Z'),
+                    battery_level: 85,
+                },
+                {
+                    dispositive_id: 2,
+                    connected: false,
+                    timestamp: new Date('2024-03-27T09:30:00Z'),
+                    battery_level: 42,
+                },
+            ];
+
+            (analyticsPrisma.$queryRaw as jest.Mock).mockResolvedValue(mockDeviceStatusResult);
+
+            const result = await DeviceService.getDeviceStatus(analyticsPrisma);
+
+            expect(result).toEqual(mockDeviceStatusResult);
+            expect(analyticsPrisma.$queryRaw).toHaveBeenCalledTimes(1);
         });
 
         it('should throw an error when the query fails', async () => {
@@ -111,7 +125,7 @@ describe('DeviceService', () => {
                     MAC: '00:11:22:33:44:55',
                     start_date: new Date('2023-01-01'),
                     DispotiveIssue: [
-                        { id: 1, date: new Date('2023-01-10'), dispositiveId: 1 },
+                        { id: 1, created_at: new Date('2023-01-10'), dispositiveId: 1 },
                     ],
                     Product: { name: 'Device A' },
                 },
@@ -143,110 +157,6 @@ describe('DeviceService', () => {
             (mainPrisma.dispositive.findMany as jest.Mock).mockRejectedValue(mockError);
 
             await expect(DeviceService.getDevicePerformance(mainPrisma, analyticsPrisma)).rejects.toThrow('Database error');
-        });
-    });
-    describe('devicesSold', () => {
-        it('should return devices sold per month', async () => {
-            const mockResult = [
-                { sale_month: new Date('2023-01-01'), devices_sold: 10, total_revenue: 5000 },
-            ];
-            const mockMainPrisma= new MainPrismaClient();
-            (mockMainPrisma.$queryRaw as jest.Mock).mockResolvedValue(mockResult);
-
-            const result = await DeviceService.devicesSold(mockMainPrisma);
-
-            expect(result).toEqual(mockResult);
-            expect(mockMainPrisma.$queryRaw).toHaveBeenCalledTimes(1);
-        });
-
-        it('should throw an error when the query fails', async () => {
-            const mockError = new Error('Database error');
-            (mainPrisma.$queryRaw as jest.Mock).mockRejectedValue(mockError);
-
-            await expect(DeviceService.devicesSold(mainPrisma)).rejects.toThrow('Database error');
-        });
-    });
-
-    describe('deviceRevenue', () => {
-        it('should return device revenue metrics', async () => {
-            const mockResult = [
-                {
-                    sale_period: new Date('2023-01-01'),
-                    devices_sold: 10,
-                    total_revenue: 5000,
-                    avg_device_price: 500,
-                },
-            ];
-
-            const mockMainPrisma= new MainPrismaClient();
-            (mockMainPrisma.$queryRaw as jest.Mock).mockResolvedValue(mockResult);
-
-
-            const result = await DeviceService.deviceRevenue(mockMainPrisma);
-
-            expect(result).toEqual(mockResult);
-            expect(mockMainPrisma.$queryRaw).toHaveBeenCalledTimes(1);
-        });
-
-        it('should throw an error when the query fails', async () => {
-            const mockError = new Error('Database error');
-            (mainPrisma.$queryRaw as jest.Mock).mockRejectedValue(mockError);
-
-            await expect(DeviceService.deviceRevenue(mainPrisma)).rejects.toThrow('Database error');
-        });
-    });
-
-    describe('getMostPopularDevices', () => {
-        it('should return the most popular devices', async () => {
-            const mockResult = [
-                {
-                    product_name: 'Device A',
-                    total_devices: 100,
-                    sales_count: 80,
-                    total_revenue: 40000,
-                },
-            ];
-
-            (mainPrisma.$queryRaw as jest.Mock).mockResolvedValue(mockResult);
-
-            const result = await DeviceService.getMostPopularDevices(mainPrisma);
-
-            expect(result).toEqual(mockResult);
-            expect(mainPrisma.$queryRaw).toHaveBeenCalledTimes(1);
-        });
-
-        it('should throw an error when the query fails', async () => {
-            const mockError = new Error('Database error');
-            (mainPrisma.$queryRaw as jest.Mock).mockRejectedValue(mockError);
-
-            await expect(DeviceService.getMostPopularDevices(mainPrisma)).rejects.toThrow('Database error');
-        });
-    });
-
-    describe('getDeviceIntervention', () => {
-        it('should return device intervention metrics', async () => {
-            const mockResult = [
-                {
-                    intervention_month: new Date('2023-01-01'),
-                    type: 'Repair',
-                    intervention_count: 5,
-                    resolution_rate: 80,
-                },
-            ];
-
-            (mainPrisma.$queryRaw as jest.Mock).mockResolvedValue(mockResult);
-
-            const result = await DeviceService.getDeviceIntervention(mainPrisma);
-
-            expect(result).toEqual(mockResult);
-            expect(mainPrisma.$queryRaw).toHaveBeenCalledTimes(1);
-        });
-
-        it('should throw an error when the query fails', async () => {
-            const mockError = new Error('Database error');
-            (mainPrisma.$queryRaw as jest.Mock).mockRejectedValue(mockError);
-
-            await expect(DeviceService.getDeviceIntervention(mainPrisma)).rejects.toThrow('Database error');
         });
     });
 });

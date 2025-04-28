@@ -17,13 +17,14 @@ export class UserSessionsService {
       throw error;
     }
   }
-  static async getTopUsers(
-    analyticsPrisma: AnalyticsClient = UserSessionsService.analyticsPrisma
+  static async getTopUsersWithNames(
+    analyticsPrisma: AnalyticsClient = UserSessionsService.analyticsPrisma,
+    prisma: MainPrismaClient = UserSessionsService.prisma
   ): Promise<
-    { user_id: number; session_count: number }[]
+    { user_id: number; session_count: number; name: string | null }[]
   > {
     try {
-      const result = await analyticsPrisma.userSessions.groupBy({
+      const topUsers = await analyticsPrisma.userSessions.groupBy({
         by: ["user_id"],
         _count: {
           user_id: true,
@@ -36,12 +37,29 @@ export class UserSessionsService {
         take: 10,
       });
 
-      return result.map((item) => ({
+      const userIds = topUsers.map((item) => item.user_id);
+
+      const users = await prisma.user.findMany({
+        where: {
+          id: {
+            in: userIds,
+          },
+        },
+        select: {
+          id: true,
+          first_name: true,
+          last_name: true,
+        },
+      });
+      const userMap = new Map(users.map((user) => [user.id, `${user.first_name} ${user.last_name}`]));
+
+      return topUsers.map((item) => ({
         user_id: item.user_id,
         session_count: item._count.user_id,
+        name: userMap.get(item.user_id) || null,
       }));
     } catch (error) {
-      console.error("Error fetching top users:", error);
+      console.error("Error fetching top users with names:", error);
       throw error;
     }
   }
@@ -72,11 +90,12 @@ export class UserSessionsService {
       throw error;
     }
   }
-  static async getUserSessionDuration(
-    analyticsPrisma: AnalyticsClient = UserSessionsService.analyticsPrisma
+  static async getUserSessionDurationWithNames(
+    analyticsPrisma: AnalyticsClient = UserSessionsService.analyticsPrisma,
+    prisma: MainPrismaClient = UserSessionsService.prisma
   ) {
     try {
-      const result = await analyticsPrisma.$queryRaw<
+      const sessionDurations = await analyticsPrisma.$queryRaw<
         { user_id: number; avg_session_duration_seconds: number }[]
       >`
                 SELECT 
@@ -87,9 +106,31 @@ export class UserSessionsService {
                 GROUP BY "user_id"
                 ORDER BY avg_session_duration_seconds DESC;
                 `;
-      return result;
+
+      const userIds = sessionDurations.map((item) => item.user_id);
+
+      const users = await prisma.user.findMany({
+        where: {
+          id: {
+            in: userIds,
+          },
+        },
+        select: {
+          id: true,
+          first_name: true,
+          last_name: true,
+        },
+      });
+
+      const userMap = new Map(users.map((user) => [user.id, `${user.first_name} ${user.last_name}`]));
+
+      return sessionDurations.map((item) => ({
+        user_id: item.user_id,
+        avg_session_duration_seconds: item.avg_session_duration_seconds,
+        name: userMap.get(item.user_id) || null,
+      }));
     } catch (error) {
-      console.error("Error calculating average session duration:", error);
+      console.error("Error calculating average session duration with names:", error);
       throw error;
     }
   }
