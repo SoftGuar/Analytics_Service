@@ -12,7 +12,7 @@ export class LogsService {
   static async getLogs(prisma: MainPrismaClient = LogsService.prisma) {
     try {
       const logs = await analyticsPrisma.logs.findMany({
-        orderBy: { time: "desc" },
+        orderBy: { created_at: "desc" },
         take: 100, // Limit to the last 100 logs
       });
       return logs;

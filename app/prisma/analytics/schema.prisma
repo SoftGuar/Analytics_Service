@@ -65,13 +65,6 @@ model UserSessions {
 
 model Logs {
   id         Int      @id @default(autoincrement())
-  level      String   @db.VarChar(10)
-  time       DateTime
-  pid        Int
-  hostname   String   @db.VarChar(255)
-  msg        String
-  error      Json?
-  request    Json?
   full_log   Json
   created_at DateTime @default(now())
 }
