@@ -5,7 +5,7 @@ export class UserHandler {
   static async getTotalUsers(req: FastifyRequest, reply: FastifyReply) {
     try {
       const userTotal = await UserSessionsService.getTotalUsers();
-      reply.status(200).send({ total_users: userTotal });
+      reply.status(200).send(userTotal);
     } catch (error) {
       console.error("Error in getUserTotal handler:", error);
       reply.status(500).send({ error: "Failed to fetch user total" });
