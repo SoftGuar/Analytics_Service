@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "app/main.ts",
   "scripts": {
-    "start": "nodemon app/main.ts",
-    "dev": "ts-node app/main.ts",
+    "start": "ts-node app/main.ts",
+    "dev": "nodemon app/main.ts",
     "build": "tsc",
     "test": "jest"
   },

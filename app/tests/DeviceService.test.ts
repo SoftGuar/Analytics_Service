@@ -1,7 +1,6 @@
 import { DeviceService } from '../services/devices/DeviceService';
 import { PrismaClient as MainPrismaClient } from "../prisma/main/generated";
 import { PrismaClient as AnalyticsClient } from "../prisma/analytics/generated";
-
 // Create a manual mock of the Prisma clients
 jest.mock('../prisma/main/generated', () => {
     return {
@@ -12,6 +11,9 @@ jest.mock('../prisma/main/generated', () => {
             dispositive: {
                 findMany: jest.fn(),
                 count: jest.fn(),
+            },
+            intervention: {
+                groupBy: jest.fn(),
             },
             $queryRaw: jest.fn(),
         })),
@@ -24,6 +26,7 @@ jest.mock('../prisma/analytics/generated', () => {
             $queryRaw: jest.fn(),
             deviceUsageLogs: {
                 findMany: jest.fn(),
+                groupBy: jest.fn(),
             },
         })),
     };
@@ -120,41 +123,36 @@ describe('DeviceService', () => {
     describe('getDevicePerformance', () => {
         it('should return device performance metrics', async () => {
             const mockDispositiveIssues = [
-                {
-                    id: 1,
-                    MAC: '00:11:22:33:44:55',
-                    start_date: new Date('2023-01-01'),
-                    DispotiveIssue: [
-                        { id: 1, created_at: new Date('2023-01-10'), dispositiveId: 1 },
-                    ],
-                    Product: { name: 'Device A' },
-                },
+                { dispositiveId: 1, _count: { id: 5 } },
             ];
 
-            const mockDeviceUsageLogs = [
-                { dispositive_id: 1, battery_level: 80 },
-                { dispositive_id: 1, battery_level: 70 },
+            const mockInterventions = [
+                { idDispositive: 1, _count: { id: 2 } },
             ];
 
-            (mainPrisma.dispositive.findMany as jest.Mock).mockResolvedValue(mockDispositiveIssues);
-            (analyticsPrisma.deviceUsageLogs.findMany as jest.Mock).mockResolvedValue(mockDeviceUsageLogs);
+            const mockBatteryLevels = [
+                { dispositive_id: 1, _avg: { battery_level: 75 } },
+            ];
+
+            (mainPrisma.dispoIssue.groupBy as jest.Mock).mockResolvedValue(mockDispositiveIssues);
+            (mainPrisma.intervention.groupBy as jest.Mock).mockResolvedValue(mockInterventions);
+            (analyticsPrisma.deviceUsageLogs.groupBy as jest.Mock).mockResolvedValue(mockBatteryLevels);
 
             const result = await DeviceService.getDevicePerformance(mainPrisma, analyticsPrisma);
 
             expect(result).toEqual([
                 {
                     device_id: 1,
-                    device_mac: '00:11:22:33:44:55',
+                    issues_count: 5,
+                    interventions_count: 2,
                     avg_battery_level: 75,
-                    total_issues: 1,
-                    avg_days_to_first_issue: 9,
                 },
             ]);
         });
 
         it('should throw an error when fetching dispositive issues fails', async () => {
             const mockError = new Error('Database error');
-            (mainPrisma.dispositive.findMany as jest.Mock).mockRejectedValue(mockError);
+            (mainPrisma.dispoIssue.groupBy as jest.Mock).mockRejectedValue(mockError);
 
             await expect(DeviceService.getDevicePerformance(mainPrisma, analyticsPrisma)).rejects.toThrow('Database error');
         });

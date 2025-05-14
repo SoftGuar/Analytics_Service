@@ -49,7 +49,7 @@ export class DeviceService {
   ) {
     try {
       const result = await prisma.$queryRaw<
-        { dispositive_id: number; issue_count: number }[]
+        { month: Date; type: string; issue_count: number }[]
       >`
             SELECT 
             DATE_TRUNC('month', di.created_at) AS month,
@@ -229,7 +229,12 @@ export class DeviceService {
   ) {
     try {
       const mostPopularDevices = await prisma.$queryRaw<
-        { device_id: number; device_mac: string; issue_count: number }[]
+        {
+          product_name: string;
+          total_devices: number;
+          sales_count: number;
+          total_revenue: number;
+        }[]
       >`
             SELECT 
                 p.name AS product_name,
@@ -260,7 +265,12 @@ export class DeviceService {
   ) {
     try {
       const deviceIntervention = await prisma.$queryRaw<
-        { device_id: number; intervention_count: number }[]
+        {
+          intervention_month: Date;
+          type: string;
+          intervention_count: number;
+          resolution_rate: number;
+        }[]
       >`
             SELECT 
                 DATE_TRUNC('month', start_date) AS intervention_month,

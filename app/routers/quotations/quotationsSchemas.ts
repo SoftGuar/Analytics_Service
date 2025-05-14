@@ -31,6 +31,7 @@ export const quotationsSchemas = {
                     type: "object",
                     properties: {
                         product_id: { type: "number" },
+                        product_name: { type: "string" },
                         count: { type: "number" }
                     }
                 }
@@ -45,7 +46,7 @@ export const quotationsSchemas = {
                 items: {
                     type: "object",
                     properties: {
-                        product_id: { type: "number" },
+                        product_name: { type: "string" },
                         conversion_rate: { type: "number" }
                     }
                 }
@@ -60,7 +61,7 @@ export const quotationsSchemas = {
                 items: {
                     type: "object",
                     properties: {
-                        product_id: { type: "number" },
+                        product_name: { type: "string" },
                         total_value: { type: "number" }
                     }
                 }
@@ -75,7 +76,7 @@ export const quotationsSchemas = {
                 items: {
                     type: "object",
                     properties: {
-                        user_id: { type: "number" },
+                        user_last_name: { type: "string" },
                         unconverted_count: { type: "number" }
                     }
                 }

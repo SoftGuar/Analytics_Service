@@ -151,12 +151,11 @@ DevicePerformanceSchema: { schema: {
                 type: 'object',
                 properties: {
                     device_id: { type: 'number' },
-                    device_mac: { type: 'string' },
-                    avg_battery_level: { type: 'number', nullable: true },
-                    total_issues: { type: 'number' },
-                    avg_days_to_first_issue: { type: 'number', nullable: true }
+                    issues_count: { type: 'number' },
+                    interventions_count: { type: 'number' },
+                    avg_battery_level: { type: 'number' },
                 },
-                required: ['device_id', 'device_mac', 'total_issues']
+                required: ['device_id', 'avg_battery_level', 'interventions_count']
             }
         }
     }
