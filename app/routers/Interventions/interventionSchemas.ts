@@ -45,9 +45,11 @@ export const interventionSchemas = {
                         type: 'object',
                         properties: {
                             maintainer_id: { type: 'number' },
+                            first_name: { type: 'string' },
+                            last_name: { type: 'string' },
                             intervention_count: { type: 'number' }
                         },
-                        required: ['maintainer_id', 'intervention_count']
+                        required: ['maintainer_id', 'first_name', 'last_name', 'intervention_count']
                     }
                 }
             }
@@ -65,9 +67,11 @@ export const interventionSchemas = {
                         properties: {
                             issue_id: { type: 'number' },
                             maintainer_id: { type: 'number' },
+                            first_name: { type: 'string' },
+                            last_name: { type: 'string' },
                             avg_response_time_minutes: { type: 'number' }
                         },
-                        required: ['issue_id', 'maintainer_id', 'avg_response_time_minutes']
+                        required: ['issue_id', 'maintainer_id', 'first_name', 'last_name', 'avg_response_time_minutes']
                     }
                 }
             }

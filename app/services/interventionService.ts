@@ -54,16 +54,25 @@ export class InterventionService {
   ) {
     try {
       const result = await prisma.$queryRaw<
-        { maintainer_id: number; intervention_count: number }[]
+        {
+          maintainer_id: number;
+          first_name: string;
+          last_name: string;
+          intervention_count: number;
+        }[]
       >`
-            SELECT
-            "idMaintainer" AS maintainer_id,
-            COUNT(*) AS intervention_count
-            FROM
-            "Intervention"
-            GROUP BY
-            "idMaintainer";
-            `;
+      SELECT
+        i."idMaintainer" AS maintainer_id,
+        m."first_name" AS first_name,
+        m."last_name" AS last_name,
+        COUNT(*) AS intervention_count
+      FROM
+        "Intervention" i
+      JOIN
+        "Maintainer" m ON i."idMaintainer" = m."id"
+      GROUP BY
+        i."idMaintainer", m."first_name", m."last_name";
+      `;
       return result;
     } catch (error) {
       console.error("Error fetching maintainer intervention count:", error);
@@ -72,30 +81,37 @@ export class InterventionService {
   }
 
   static async getAverageAnswerTime(
-    prisma: MainPrismaClient = InterventionService.prisma
-  ) {
-    try {
-      const result = await prisma.$queryRaw<
-        {
-          issue_id: number;
-          maintainer_id: number;
-          avg_response_time_minutes: number;
-        }[]
-      >`
-            SELECT 
-            d.id AS issue_id,
-            i."idMaintainer" AS maintainer_id,
-            AVG(EXTRACT(EPOCH FROM (i.start_date - d.created_at)) / 60) AS avg_response_time_minutes
-            FROM "DispoIssue" d
-            JOIN "Intervention" i ON d."maintainerId" = i."idMaintainer"
-            WHERE i.start_date IS NOT NULL
-            GROUP BY d.id, i."idMaintainer"
-            ORDER BY avg_response_time_minutes ASC;
-            `;
-      return result;
-    } catch (error) {
-      console.error("Error fetching average answer time:", error);
-      throw error;
-    }
+  prisma: MainPrismaClient = InterventionService.prisma
+) {
+  try {
+    const result = await prisma.$queryRaw
+    <
+      {
+        issue_id: number;
+        maintainer_id: number;
+        first_name: string;
+        last_name: string;
+        avg_response_time_minutes: number;
+      }[]
+    >
+    `
+      SELECT 
+        d.id AS issue_id,
+        i."idMaintainer" AS maintainer_id,
+        m."first_name" AS first_name,
+        m."last_name" AS last_name,
+        AVG(EXTRACT(EPOCH FROM (i.start_date - d.created_at)) / 60) AS avg_response_time_minutes
+      FROM "DispoIssue" d
+      JOIN "Intervention" i ON d."maintainerId" = i."idMaintainer"
+      JOIN "Maintainer" m ON i."idMaintainer" = m."id"
+      WHERE i.start_date IS NOT NULL
+      GROUP BY d.id, i."idMaintainer", m."first_name", m."last_name"
+      ORDER BY avg_response_time_minutes ASC;
+      `;
+    return result;
+  } catch (error) {
+    console.error("Error fetching average answer time:", error);
+    throw error;
   }
+}
 }
