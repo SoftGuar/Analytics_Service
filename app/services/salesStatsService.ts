@@ -41,47 +41,56 @@ export class SalesStatsService {
       throw error;
     }
   }
-
-  // Optional: Add method to get more detailed retention insights
   async getCustomerRetentionDetails(
-    prisma: PrismaClient = prismaMain
-  ) {
-    try {
-      const result = await prisma.$queryRaw<
-        { 
-          new_customers: number; 
-          existing_customers: number; 
-          total_customers: number;
-          retention_rate: number;
-        }[]
-      >`
-        WITH CustomerClassification AS (
-          SELECT 
-          id,
-            CASE 
-              WHEN created_at >= NOW() - INTERVAL '30 days' THEN 'new'
-              ELSE 'existing'
-            END AS customer_type
-          FROM "User"
-        )
+  prisma: PrismaClient = prismaMain
+) {
+  try {
+    const result = await prisma.$queryRaw<
+      { 
+        new_customers: number; 
+        existing_customers: number; 
+        total_customers: number;
+        retention_rate: number;
+      }[]
+    >`
+      WITH CustomerClassification AS (
         SELECT 
-          COUNT(DISTINCT CASE WHEN customer_type = 'new' THEN id END)::Integer AS new_customers,
-          COUNT(DISTINCT CASE WHEN customer_type = 'existing' THEN id END)::Integer AS existing_customers,
-          COUNT(DISTINCT id)::Integer AS total_customers,
+          id,
+          CASE 
+            WHEN created_at >= NOW() - INTERVAL '30 days' THEN 'new'
+            ELSE 'existing'
+          END AS customer_type
+        FROM "User"
+        WHERE created_at IS NOT NULL
+      )
+      SELECT 
+        COUNT(DISTINCT CASE WHEN customer_type = 'new' THEN id END)::Integer AS new_customers,
+        COUNT(DISTINCT CASE WHEN customer_type = 'existing' THEN id END)::Integer AS existing_customers,
+        COUNT(DISTINCT id)::Integer AS total_customers,
+        LEAST(
           (COUNT(DISTINCT CASE WHEN customer_type = 'existing' THEN id END) * 100.0 / 
-           NULLIF(COUNT(DISTINCT 1), 0))::Numeric(5,2) AS retention_rate
-        FROM CustomerClassification;
+          NULLIF(COUNT(DISTINCT id), 0))::Numeric(10,2),
+          100.00
+        ) AS retention_rate
+      FROM CustomerClassification;
     `;
 
-      return result[0] || {
-        new_customers: 0,
-        existing_customers: 0,
-        total_customers: 0,
-        retention_rate: 0
-      };
-    } catch (error) {
-      console.error("Error fetching customer retention details:", error);
-      throw error;
-    }
+    return result[0] || {
+      new_customers: 0,
+      existing_customers: 0,
+      total_customers: 0,
+      retention_rate: 0
+    };
+  } catch (error) {
+    console.error("Error fetching customer retention details:", error);
+    throw error;
   }
 }
+}
+const salesStatsService = new SalesStatsService();
+salesStatsService.getCRR().then(crr => {
+  console.log("Customer Retention Rate (CRR):", crr);
+}).catch(error => console.error(error));
+salesStatsService.getCustomerRetentionDetails().then(details => {
+  console.log("Customer Retention Details:", details);
+}).catch(error => console.error(error));
