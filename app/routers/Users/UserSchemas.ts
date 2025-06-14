@@ -31,42 +31,7 @@ export const userSchemas = {
             }
         }
     },
-    UserRatingsSchema: {
-        schema: {
-            description: 'Get the overall average user rating',
-            tags: ['Users'],
-            response: {
-                200: {
-                    type: 'object',
-                    properties: {
-                        overall_avg_rating: { type: 'number' }
-                    },
-                    required: ['overall_avg_rating']
-                }
-            }
-        }
-    },
-    UserFeedbackSchema: {
-        schema: {
-            description: 'Get all user feedback',
-            tags: ['Users'],
-            response: {
-                200: {
-                    type: 'array',
-                    items: {
-                        type: 'object',
-                        properties: {
-                            id: { type: 'number' },
-                            user_id: { type: 'number' },
-                            rating: { type: 'number' },
-                            created_at: { type: 'string', format: 'date-time' }
-                        },
-                        required: ['id', 'user_id', 'rating', 'created_at']
-                    }
-                }
-            }
-        }
-    },
+    
     UserSessionDurationSchema: {
         schema: {
             description: 'Get the average session duration for each user with their names',

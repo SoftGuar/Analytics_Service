@@ -87,50 +87,6 @@ describe('UserSessionsService', () => {
             await expect(UserSessionsService.getTopUsersWithNames(analyticsPrisma, mainPrisma)).rejects.toThrow('Database error');
         });
     });
-
-    describe('getUserRatings', () => {
-        it('should fetch user ratings successfully', async () => {
-            const mockResult = [{ overall_avg_rating: 4.5 }];
-
-            (analyticsPrisma.$queryRaw as jest.Mock).mockResolvedValue(mockResult);
-
-            const result = await UserSessionsService.getUserRatings(analyticsPrisma);
-
-            expect(result).toEqual(mockResult[0]);
-            expect(analyticsPrisma.$queryRaw).toHaveBeenCalledTimes(1);
-        });
-
-        it('should throw an error when fetching user ratings fails', async () => {
-            const mockError = new Error('Database error');
-            (analyticsPrisma.$queryRaw as jest.Mock).mockRejectedValue(mockError);
-
-            await expect(UserSessionsService.getUserRatings(analyticsPrisma)).rejects.toThrow('Database error');
-        });
-    });
-
-    describe('getUserFeedback', () => {
-        it('should fetch user feedback successfully', async () => {
-            const mockFeedback = [
-                { id: 1, user_id: 1, rating: 5, comment: 'Great!' },
-                { id: 2, user_id: 2, rating: 4, comment: 'Good' },
-            ];
-
-            (analyticsPrisma.feedback.findMany as jest.Mock).mockResolvedValue(mockFeedback);
-
-            const result = await UserSessionsService.getUserFeedback(analyticsPrisma);
-
-            expect(result).toEqual(mockFeedback);
-            expect(analyticsPrisma.feedback.findMany).toHaveBeenCalledTimes(1);
-        });
-
-        it('should throw an error when fetching user feedback fails', async () => {
-            const mockError = new Error('Database error');
-            (analyticsPrisma.feedback.findMany as jest.Mock).mockRejectedValue(mockError);
-
-            await expect(UserSessionsService.getUserFeedback(analyticsPrisma)).rejects.toThrow('Database error');
-        });
-    });
-
     describe('getUserSessionDurationWithNames', () => {
         it('should fetch average session duration with names successfully', async () => {
             const mockDurations = [

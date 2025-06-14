@@ -63,33 +63,6 @@ export class UserSessionsService {
       throw error;
     }
   }
-  static async getUserRatings(
-    analyticsPrisma: AnalyticsClient = UserSessionsService.analyticsPrisma
-  ) {
-    try {
-      const result = await analyticsPrisma.$queryRaw<
-       {overall_avg_rating: number}[]
-      >`
-                SELECT AVG("rating") AS overall_avg_rating
-                FROM "Feedback";
-                `;
-      return result[0];
-    } catch (error) {
-      console.error("Error fetching user ratings:", error);
-      throw error;
-    }
-  }
-  static async getUserFeedback(
-    analyticsPrisma: AnalyticsClient = UserSessionsService.analyticsPrisma
-  ) {
-    try {
-      const result = await analyticsPrisma.feedback.findMany();
-      return result;
-    } catch (error) {
-      console.error("Error fetching user feedback:", error);
-      throw error;
-    }
-  }
   static async getUserSessionDurationWithNames(
     analyticsPrisma: AnalyticsClient = UserSessionsService.analyticsPrisma,
     prisma: MainPrismaClient = UserSessionsService.prisma
