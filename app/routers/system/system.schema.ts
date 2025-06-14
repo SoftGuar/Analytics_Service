@@ -1,0 +1,62 @@
+import { FastifySchema } from "fastify";
+
+export const getUptimeStatsSchema: FastifySchema = {
+    description: "Get system uptime statistics",
+    tags: ["System"],
+    response: {
+        200: {
+            type: "object",
+            properties: {
+                averageUptimeRaw: { type: "number", description: "System uptime average Raw" },
+                maxUptimeRaw:  { type: "number", description: "System uptime max Raw" },
+                averageUptime: { type: "string", description: "System uptime average formatted as 'Xh Ym'" },
+                maxUptime:     { type: "string", description: "System uptime max formatted as 'Xh Ym'" }
+            }
+        }
+    }
+};
+
+export const getAnomaliesSchema: FastifySchema = {
+    description: "Get system anomalies",
+    tags: ["System"],
+    response: {
+        200: {
+            type: "object",
+            properties: {
+                anomalies: {
+                    type: "array",
+                    items: {
+                        type: "object",
+                        properties: {
+                            timestamp: { type: "string", format: "date-time" },
+                            service: { type: "string", description: "Service name where the anomaly occurred" },
+                        },
+                    }
+                }
+            }
+        }
+    }
+};
+
+export const getDiskUsageSchema: FastifySchema = {
+    description: "Get system disk usage",
+    tags: ["System"],
+    response: {
+        200: {
+            type: "object",
+            properties: {
+                diskUsage: {
+                    type: "array",
+                    items: {
+                        type: "object",
+                        properties: {
+                            timestamp: { type: "string", format: "date-time" },
+                            disk_usage_percent: { type: "number", description: "Disk usage percentage" },
+                            cpu_usage: { type: "number", description: "CPU usage percentage" }
+                        }
+                    }
+                }
+            }
+        }
+    }
+};
