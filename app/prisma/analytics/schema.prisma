@@ -46,16 +46,8 @@ model DeviceUsageLogs {
   connected      Boolean
 }
 
-model Feedback {
-  id         Int      @id @default(autoincrement())
-  user_id    Int
-  rating     Int
-  comment    String?
-  created_at DateTime @default(now())
-}
-
 model UserSessions {
-  id            Int       @id @default(autoincrement())
+  id            String   @id
   user_id       Int
   session_start DateTime  @default(now())
   session_end   DateTime?
