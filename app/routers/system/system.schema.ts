@@ -1,6 +1,6 @@
-import { FastifySchema } from "fastify";
 
-export const getUptimeStatsSchema: FastifySchema = {
+export const getUptimeStatsSchema= {
+    schema: {
     description: "Get system uptime statistics",
     tags: ["System"],
     response: {
@@ -13,10 +13,11 @@ export const getUptimeStatsSchema: FastifySchema = {
                 maxUptime:     { type: "string", description: "System uptime max formatted as 'Xh Ym'" }
             }
         }
-    }
+    }}
 };
 
-export const getAnomaliesSchema: FastifySchema = {
+export const getAnomaliesSchema={
+schema:{
     description: "Get system anomalies",
     tags: ["System"],
     response: {
@@ -35,20 +36,21 @@ export const getAnomaliesSchema: FastifySchema = {
                 }
             }
         }
-    }
+    }}
 };
 
-export const getDiskUsageSchema: FastifySchema = {
-    description: "Get system disk usage",
-    tags: ["System"],
-    response: {
-        200: {
-            type: "object",
-            properties: {
-                diskUsage: {
-                    type: "array",
-                    items: {
-                        type: "object",
+export const getDiskUsageSchema = {
+    schema: {
+        description: "Get system disk usage",
+        tags: ["System"],
+        response: {
+            200: {
+                type: "object",
+                properties: {
+                    diskUsage: {
+                        type: "array",
+                        items: {
+                            type: "object",
                         properties: {
                             timestamp: { type: "string", format: "date-time" },
                             disk_usage_percent: { type: "number", description: "Disk usage percentage" },
@@ -59,4 +61,4 @@ export const getDiskUsageSchema: FastifySchema = {
             }
         }
     }
-};
+}};
