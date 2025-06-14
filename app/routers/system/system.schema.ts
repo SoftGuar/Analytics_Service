@@ -22,19 +22,7 @@ schema:{
     tags: ["System"],
     response: {
         200: {
-            type: "object",
-            properties: {
-                anomalies: {
-                    type: "array",
-                    items: {
-                        type: "object",
-                        properties: {
-                            timestamp: { type: "string", format: "date-time" },
-                            service: { type: "string", description: "Service name where the anomaly occurred" },
-                        },
-                    }
-                }
-            }
+           type: "array"
         }
     }}
 };
@@ -45,7 +33,7 @@ export const getDiskUsageSchema = {
         tags: ["System"],
         response: {
             200: {
-                type: "object",
+                type: "array",
                 properties: {
                     diskUsage: {
                         type: "array",

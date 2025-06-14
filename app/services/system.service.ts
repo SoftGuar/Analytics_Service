@@ -51,7 +51,7 @@ async function fetchAnomalies(
         { network_errors: { gt: 10 } }
       ],
       timestamp: {
-        gte: new Date(new Date().setDate(new Date().getDate() - 30)) // Last 30 days
+        gte: new Date(new Date().setDate(new Date().getDate() - 60))
       }
     }
   });
