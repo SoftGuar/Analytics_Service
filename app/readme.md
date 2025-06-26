@@ -24,14 +24,28 @@ The **Analytics Service** is a modular and scalable project designed to provide 
     ```bash
     npm install
     ```
+4. generate prisma client 
+```sh 
+npx prisma generate --schema app/prisma/analytics/schema.prisma
+npx prisma generate --schema app/prisma/main/schema.prisma
 
 ## Usage
 
 1. Start the development server:
     ```bash
-    npm start
+    npm run dev
     ```
-2. Access the service at `http://localhost:3000`.
+
+# Run Tests 
+Execute the test suite using Jest:
+```sh
+npm run test
+```
+
+# API Documentation
+Swagger documentation is available at 
+https://BASE_URL/docs.
+
 
 ## API Endpoints
 
